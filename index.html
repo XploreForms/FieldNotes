@@ -184,11 +184,18 @@ input:focus, textarea:focus, .choice:focus-visible, .link-btn:focus-visible, but
 .choices.cols-list { gap: 0.35rem; }
 .choices.cols-list .choice { justify-content: flex-start; text-align: left; min-height: 0; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
 .choices.cols-list .choice .mark { display: none; }
-.tower-card { border-radius: 0.9rem; padding: 0.9rem 0.9rem 0.2rem; margin-bottom: 1rem; box-shadow: inset 0 0 0 2px var(--xp-soft-line, #C7D9CF); }
-.tower-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; font-weight: 700; }
-.tower-card-head button { font: inherit; font-size: 0.85rem; font-weight: 600; background: none; border: 0; color: inherit; opacity: 0.7; text-decoration: underline; padding: 0.3rem; cursor: pointer; }
-.tower-card .field-pair > .field, .tower-card .field-pair > .field-pair > .field { margin-bottom: 1rem; }
-.tower-card .mini-check-wrap { margin: 0 0 1rem; }
+.tower-card { display: flex; flex-direction: column; gap: 1rem; border-radius: 0.9rem; padding: 0.9rem 0.9rem 1rem; margin-bottom: 1rem; box-shadow: inset 0 0 0 2px var(--xp-soft-line, #C7D9CF); }
+.tower-card > *, .tower-card .field, .tower-card .field-pair > .field, .tower-card .field-pair > .field-pair > .field, .tower-card .mini-check-wrap { margin: 0 !important; }
+.tower-card .field { padding: 0; }
+.tower-card-head { display: flex; align-items: center; justify-content: space-between; font-weight: 700; margin-bottom: -0.25rem !important; }
+.tower-card-head { gap: 0.6rem; }
+.tower-card-title { flex: 1 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tower-card-head .tower-remove { font: inherit; font-size: 1rem; font-weight: 700; background: none; border: 0; color: inherit; opacity: 0.6; width: 2rem; height: 2rem; margin: -0.3rem -0.4rem -0.3rem -0.2rem; border-radius: 50%; cursor: pointer; flex: 0 0 auto; }
+.nosig-pill { flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem; font: inherit; font-size: 0.85rem; font-weight: 600; color: inherit; background: transparent; border: 0; border-radius: 999px; padding: 0.35rem 0.7rem 0.35rem 0.45rem; box-shadow: inset 0 0 0 2px var(--xp-soft-line, #C7D9CF); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nosig-pill .box { width: 1.05rem; height: 1.05rem; border-radius: 0.3rem; box-shadow: inset 0 0 0 2px currentColor; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; line-height: 1; }
+.nosig-pill.on { background: var(--xp-green, #58C774); color: var(--xp-dark, #002B2B); box-shadow: none; }
+.nosig-pill.on .box { box-shadow: inset 0 0 0 2px var(--xp-dark, #002B2B); }
+[data-field-id="no_coverage"] .mini-check-wrap { margin-top: 0; }
 .add-tower { width: 100%; margin-bottom: 1.7rem; justify-content: center; }
 .time-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0.9rem; }
 .time-pair input.time-input { width: 100%; box-sizing: border-box; min-height: 2.9rem; }
@@ -648,7 +655,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
         <span class="ts-label">Retro Mode</span><span class="ts-track"><span class="ts-knob"></span></span>
       </button>
     </div>
-    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.13.2</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
+    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.13.3</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
   </footer>
 </div>
 
@@ -664,7 +671,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
 <div id="dialog-mount"></div>
 
 <script>
-var APP_VERSION = '2.13.2';
+var APP_VERSION = '2.13.3';
 /* ===================== helpers ===================== */
 function $(id) { return document.getElementById(id); }
 
@@ -1653,6 +1660,16 @@ function nrStructureComps(show) {
 /* every tower tested on a signal not required: tower, platform, cell ID and readings (or No Signal Found), and a testing note */
 var TOWER_MAX = 8;
 function towerCount() { var n = +STATE.t_count || 1; return Math.max(1, Math.min(TOWER_MAX, n)); }
+/* sign-off for a job booked outside the coverage footprint: towers tested then become optional */
+function outOfCoverage() { return STATE.no_coverage === true; }
+function noCoverageC() {
+  return {
+    id: 'no_coverage',
+    render: function () { var w = el('div', { class: 'field', 'data-field-id': 'no_coverage' }); w.appendChild(miniCheck('no_coverage', 'Location not within any open coverage on Compass')); return w; },
+    check: function () {},
+    out: function () { return outOfCoverage() ? ['Coverage: Location not within any open coverage on Compass'] : []; }
+  };
+}
 function towerTestsC() {
   function k(i, f) { return 't' + i + '_' + f; }
   function noSig(i) { return STATE[k(i, 'nosig')] === true; }
@@ -1668,8 +1685,8 @@ function towerTestsC() {
   }
   function removeTower(i) {
     var n = towerCount();
-    for (var j = i; j < n; j++) ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'notes'].forEach(function (f) { STATE[k(j, f)] = STATE[k(j + 1, f)]; });
-    ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'notes'].forEach(function (f) { delete STATE[k(n, f)]; });
+    for (var j = i; j < n; j++) ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'stopsell', 'notes'].forEach(function (f) { STATE[k(j, f)] = STATE[k(j + 1, f)]; });
+    ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'stopsell', 'notes'].forEach(function (f) { delete STATE[k(n, f)]; });
     STATE.t_count = n - 1; changed('towers', true);
   }
   return {
@@ -1678,11 +1695,16 @@ function towerTestsC() {
       var n = towerCount(), wrap = el('div', { class: 'field', 'data-field-id': 'towers' });
       for (var i = 1; i <= n; i++) (function (i) {
         var p = parts(i), card = el('div', { class: 'tower-card', 'data-anim': 'tower' + i });
-        card.appendChild(el('div', { class: 'tower-card-head' }, [el('span', { text: i === 1 ? 'Best Option Found' : 'Tower ' + i }),
-          n > 1 ? el('button', { type: 'button', text: 'Remove', onclick: function () { removeTower(i); } }) : null]));
+        var ns = noSig(i);
+        card.appendChild(el('div', { class: 'tower-card-head' }, [el('span', { class: 'tower-card-title', text: i === 1 ? 'Best Option Found' : 'Tower ' + i }),
+          el('button', { type: 'button', class: 'nosig-pill' + (ns ? ' on' : ''), 'aria-pressed': ns ? 'true' : 'false', onclick: function () { STATE[k(i, 'nosig')] = !ns; changed('towers', true); } },
+            [el('span', { class: 'box', text: ns ? '✓' : '' }), el('span', { text: 'No Signal' })]),
+          n > 1 ? el('button', { type: 'button', class: 'tower-remove', text: '✕', 'aria-label': 'Remove this tower', title: 'Remove', onclick: function () { removeTower(i); } }) : null]));
         card.appendChild(el('div', { class: 'field-pair' }, [p.tower.render(), p.plat.render()]));
-        card.appendChild(miniCheck(k(i, 'nosig'), 'No signal found'));
-        if (!noSig(i)) card.appendChild(el('div', { class: 'field-pair' }, [p.cell.render(), el('div', { class: 'field-pair tight mini' }, [p.rsrp.render(), p.sinr.render()])]));
+        if (!noSig(i)) {
+          card.appendChild(el('div', { class: 'field-pair' }, [p.cell.render(), el('div', { class: 'field-pair tight mini' }, [p.rsrp.render(), p.sinr.render()])]));
+          card.appendChild(miniCheck(k(i, 'stopsell'), 'Serviceable signal found, but panel is on stop sell'));
+        }
         var notes = p.notes.render(); notes.querySelector('.q').appendChild(el('span', { class: 'opt', text: ' (optional)' }));
         card.appendChild(notes);
         wrap.appendChild(card);
@@ -1691,6 +1713,7 @@ function towerTestsC() {
       return wrap;
     },
     check: function (need, issues) {
+      if (outOfCoverage()) return;   // nothing in coverage to test to
       for (var i = 1; i <= towerCount(); i++) {
         var p = parts(i);
         p.tower.check(need, issues); p.plat.check(need, issues);
@@ -1700,14 +1723,16 @@ function towerTestsC() {
     out: function (m) {
       var l = ['Towers Tested:'];
       for (var i = 1; i <= towerCount(); i++) {
+        if (outOfCoverage() && !str(STATE[k(i, 'tower')])) continue;   // out of coverage: list only towers actually tested
         var t = str(STATE[k(i, 'tower')]) || m(k(i, 'tower'), 'Tower'), pl = STATE[k(i, 'plat')] || m(k(i, 'plat'), 'Platform');
         var sig = noSig(i) ? 'No signal found' : 'Cell ID ' + (str(STATE[k(i, 'cell')]) || m(k(i, 'cell'), 'Cell ID')) +
           ', RSRP ' + (str(STATE[k(i, 'rsrp')]) ? '-' + str(STATE[k(i, 'rsrp')]) + ' dBm' : m(k(i, 'rsrp'), 'RSRP')) +
           ', SINR ' + (str(STATE[k(i, 'sinr')]) ? str(STATE[k(i, 'sinr')]) + ' dB' : m(k(i, 'sinr'), 'SINR'));
+        if (!noSig(i) && STATE[k(i, 'stopsell')] === true) sig += ', serviceable signal found but panel is on stop sell';
         var note = str(STATE[k(i, 'notes')]);
-        l.push('- ' + (i === 1 ? 'Best option found: ' : '') + cap(t) + ' (' + pl + '): ' + sig + (note ? ' - ' + note : ''));
+        l.push('- ' + (i === 1 && !outOfCoverage() ? 'Best option found: ' : '') + cap(t) + ' (' + pl + '): ' + sig + (note ? ' - ' + note : ''));
       }
-      return l;
+      return l.length > 1 ? l : [];
     }
   };
 }
@@ -1726,10 +1751,10 @@ function notRequiredForm() {
           return w; },
         check: function (need, issues) { textC({ id: 'nr_desc', label: 'Detailed Description', multi: true }).check(need, issues); },
         out: function (m) { return textC({ id: 'nr_desc', label: 'Detailed Description', out: 'Description', multi: true }).out(m); } }]),
-    S('Towers Tested', [towerTestsC()].map(function (c) { c.show = nrFwSignal; return c; })),
+    S('Towers Tested', [noCoverageC(), towerTestsC()].map(function (c) { c.show = nrFwSignal; return c; })),
     S('Testing', [
       pairC(textC({ id: 'test_loc', label: 'Testing Location' }), readingC({ id: 'test_height', label: 'Testing Height', unit: 'ft', digits: 3, sign: 'none' })),
-      choiceC({ id: 'test_cpe', label: 'CPE Used for Testing', options: ['Pro Max', 'Next-Gen 5G', 'CAT12 LTE'], cols: 3 }),
+      choiceC({ id: 'test_cpe', label: 'CPE Used for Testing', options: ['Pro Max', 'Standard Gain'], cols: 2 }),   // Pro Max works on FWN and LTE
       choiceC({ id: 'no_promax', label: 'Why Pro Max Was Not Used', out: 'Pro Max Not Used', cols: 2, otherLabel: 'Other Reason', show: function () { return nrFwSignal() && !!STATE.test_cpe && STATE.test_cpe !== 'Pro Max'; }, options: [
         ['RSRP Failing QOI by Over 10dBm', 'RSRP failing QOI by over 10dBm, did not test with Pro Max'], ['Pro Max Not Stocked', 'Pro Max radio not stocked'], 'Other'] }),
       choiceC({ id: 'pole_test', label: '10ft Pole Testing', cols: 2, otherLabel: 'Other Pole Testing', options: [
@@ -2380,6 +2405,7 @@ function initSettings() {
 
 /* ===================== change log (opened from the version number in the footer; newest first) ===================== */
 var CHANGELOG = [
+  { v: '2.13.3', d: 'Nov 6, 2026', items: ['Fixed Wireless signal not required: new Location not within any open coverage on Compass tick box (towers tested become optional).', 'Tower cards have even spacing, and No Signal is a small switch in each card\'s title row.', 'Each tower can be marked Serviceable signal found, but panel is on stop sell.', 'CPE Used for Testing is now Pro Max or Standard Gain.', 'When a new version is posted, the home screen app shows "A new version of Field Notes is ready" with an Update button. Your job in progress is kept.'] },
   { v: '2.13.2', d: 'Nov 6, 2026', items: ['The minus sign for RSRP and Light Level Reading now sits inside the box.', 'Cannot Complete and Not Required reasons are a compact, left-aligned list.', 'Towers Tested: the first card is the Best Option Found.'] },
   { v: '2.13.1', d: 'Nov 6, 2026', items: [
     'Cannot Complete and Not Required reasons are one list.',
@@ -2835,7 +2861,35 @@ function initRetro() {
   window.addEventListener('resize', function () { updatePreview(); });
 })();
 
-if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) { window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); }); }
+
+(function () {
+  if (!('serviceWorker' in navigator) || !/^https?:/.test(location.protocol)) return;
+  var reloading = false, hadController = !!navigator.serviceWorker.controller;
+  function offer(reg) {
+    if (!reg.waiting || !navigator.serviceWorker.controller) return;
+    var go = function () { try { if (typeof wipSaveNow === 'function') wipSaveNow(); } catch (e) {} reg.waiting && reg.waiting.postMessage('skip-waiting'); };
+    if (typeof showToast === 'function') showToast('A new version of Field Notes is ready.', 'Update', go, 0);
+    else if (confirm('A new version of Field Notes is ready. Update now?')) go();
+  }
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (reloading || !hadController) { hadController = true; return; }
+    reloading = true; location.reload();
+  });
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+      offer(reg);
+      reg.addEventListener('updatefound', function () {
+        var w = reg.installing; if (!w) return;
+        w.addEventListener('statechange', function () { if (w.state === 'installed') offer(reg); });
+      });
+      function check() { if (navigator.onLine !== false) reg.update().catch(function () {}); }
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { check(); offer(reg); } });
+      window.addEventListener('online', check);
+      setInterval(check, 30 * 60 * 1000);
+    }).catch(function () {});
+  });
+})();
+
 </script>
 </body>
 </html>
