@@ -137,13 +137,13 @@ header.app-header p { margin: 0.3rem 0 0; font-size: 0.9rem; line-height: 1.4; c
   display: flex; align-items: center; gap: 0.6rem; position: relative;
   -webkit-tap-highlight-color: transparent;
 }
-.choices.cols-5 .choice, .choices.cols-4 .choice, .choices.cols-3 .choice, .choices.cols-2 .choice { justify-content: center; text-align: center; }
+.choices.cols-5 .choice, .choices.cols-4 .choice, .choices.cols-3 .choice, .choices.cols-2 .choice, .choices.cols-1 .choice { justify-content: center; text-align: center; }
 .choice .mark {
   flex: 0 0 1.5rem; width: 1.5rem; height: 1.5rem; border-radius: 50%;
   border: 2px solid var(--xp-white); display: inline-flex; align-items: center; justify-content: center;
   font-size: 0.95rem; line-height: 1;
 }
-.choices.cols-5 .choice .mark, .choices.cols-4 .choice .mark, .choices.cols-3 .choice .mark, .choices.cols-2 .choice .mark { display: none; }
+.choices.cols-5 .choice .mark, .choices.cols-4 .choice .mark, .choices.cols-3 .choice .mark, .choices.cols-2 .choice .mark, .choices.cols-1 .choice .mark { display: none; }
 .choices.cols-5 .choice, .choices.cols-4 .choice, .choices.cols-3 .choice, .choices.cols-2 .choice { padding-left: 0.35rem; padding-right: 0.35rem; }
 .choices.cols-3 { gap: 0.45rem; }
 .choices.cols-3 .choice { font-size: 0.88rem; padding-left: 0.2rem; padding-right: 0.2rem; }
@@ -178,6 +178,20 @@ input:focus, textarea:focus, .choice:focus-visible, .link-btn:focus-visible, but
 .unit-row { display: flex; align-items: center; gap: 0.6rem; }
 .field-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 0.9rem; }
 .field-pair > .field { min-width: 0; }
+.field-pair:not(:last-child) > .field, .field-pair:not(:last-child) > .field-pair > .field { margin-bottom: 1.7rem; }   /* a pair inside a section keeps the normal gap below it */
+.checks-col { display: grid; }
+/* long reason lists: compact and left-aligned so they scan like a list */
+.choices.cols-list { gap: 0.35rem; }
+.choices.cols-list .choice { justify-content: flex-start; text-align: left; min-height: 0; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
+.choices.cols-list .choice .mark { display: none; }
+.tower-card { border-radius: 0.9rem; padding: 0.9rem 0.9rem 0.2rem; margin-bottom: 1rem; box-shadow: inset 0 0 0 2px var(--xp-soft-line, #C7D9CF); }
+.tower-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; font-weight: 700; }
+.tower-card-head button { font: inherit; font-size: 0.85rem; font-weight: 600; background: none; border: 0; color: inherit; opacity: 0.7; text-decoration: underline; padding: 0.3rem; cursor: pointer; }
+.tower-card .field-pair > .field, .tower-card .field-pair > .field-pair > .field { margin-bottom: 1rem; }
+.tower-card .mini-check-wrap { margin: 0 0 1rem; }
+.add-tower { width: 100%; margin-bottom: 1.7rem; justify-content: center; }
+.time-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 0.9rem; }
+.time-pair input.time-input { width: 100%; box-sizing: border-box; min-height: 2.9rem; }
 .field-pair.under-right > .field:nth-child(3) { grid-column: 2; }   /* e.g. Cell ID under Platform */
 .field-pair.tight { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 0.8rem; }   /* readings sit close together, wrapping on very narrow phones */
 .field-pair.tight > .field { flex: 0 0 auto; }
@@ -194,6 +208,13 @@ input:focus, textarea:focus, .choice:focus-visible, .link-btn:focus-visible, but
 .field-pair .unit-row input.light-input { flex: 0 1 4.6rem; width: 4.6rem; min-width: 3.2rem; }
 .field-pair .hint { display: none; }
 .unit-row .prefix, .unit-row .suffix { font-weight: 600; font-size: 1.05rem; }
+/* a minus that sits inside the box (RSRP, light level): overlaid on the input's left edge */
+.unit-row { --ug: 0.6rem; }
+.field-pair .unit-row { --ug: 0.4rem; }
+.field-pair.mini .unit-row { --ug: 0.25rem; }
+.unit-row .neg-in { position: relative; z-index: 1; width: 1.1rem; margin-right: calc(-1.1rem - var(--ug)); text-align: right; font-size: 1.05rem; pointer-events: none; flex: 0 0 auto; }
+.unit-row input.light-input.has-neg { padding-left: 1.15rem; }
+.field-pair.mini .unit-row input.light-input.has-neg { min-width: 3.1rem; padding-left: 1rem; }
 .unit-row input.light-input { flex: 0 0 6rem; width: 6rem; text-align: center; font-size: 1.05rem; font-weight: 400; padding: 0.85rem 0.4rem; }
 
 .warn {
@@ -627,7 +648,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
         <span class="ts-label">Retro Mode</span><span class="ts-track"><span class="ts-knob"></span></span>
       </button>
     </div>
-    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.10.1</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
+    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.13.2</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
   </footer>
 </div>
 
@@ -643,7 +664,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
 <div id="dialog-mount"></div>
 
 <script>
-var APP_VERSION = '2.10.1';
+var APP_VERSION = '2.13.2';
 /* ===================== helpers ===================== */
 function $(id) { return document.getElementById(id); }
 
@@ -891,7 +912,8 @@ function lightBlock() {
     updatePreview();
   }
   updateWarn();
-  var row = el('div', { class: 'unit-row' }, [el('span', { class: 'prefix', text: '−' }), inp, el('span', { class: 'suffix', text: 'dBm' })]);
+  inp.classList.add('has-neg');
+  var row = el('div', { class: 'unit-row' }, [el('span', { class: 'neg-in', 'aria-hidden': 'true', text: '−' }), inp, el('span', { class: 'suffix', text: 'dBm' })]);
   var e = errFor(id);
   var wrap = el('div', { class: 'field light-block' + (e ? ' has-error' : ''), 'data-field-id': id }, [
     el('p', { class: 'sub-q', style: 'margin-top:0', text: 'Light Level Reading' }), row, warn
@@ -1034,7 +1056,7 @@ function readingC(o) {
       inp.addEventListener('input', function () { var c = clean(inp.value); if (inp.value !== c) inp.value = c; STATE[o.id] = c; changed(o.id, false); });
       inp.addEventListener('focus', function () { if (inp.value) setTimeout(function () { try { inp.setSelectionRange(0, inp.value.length); } catch (e) {} }, 0); });
       var lead;
-      if (o.sign === 'minus') lead = el('span', { class: 'prefix', text: '−' });
+      if (o.sign === 'minus') { lead = el('span', { class: 'neg-in', 'aria-hidden': 'true', text: '−' }); inp.classList.add('has-neg'); }
       else if (o.sign === 'toggle') {
         var isNeg = STATE[o.id + '_neg'] === true;
         lead = el('button', {
@@ -1295,12 +1317,13 @@ var CPE_TYPES = ['CAT12 2.5GHz', 'CAT12 3.5GHz', 'First Gen 5G', 'Next Gen 5G', 
 var GROUND_SOURCES = [['Power Meter', 'Power meter'], ['Electrical Panel', 'Electrical panel'], ['Ground Rod', 'Ground rod'], ['Tower', 'Tower'], ['Copper Pipe', 'Copper pipe'], ['HVAC Disconnect', 'HVAC disconnect'], 'Other'];
 /* fixed wireless install and conversion mounts: the type, then a tick if an existing mount was reused */
 var FW_MOUNTS = [['J-Arm', 'j-arm'], ['J-Arm + Side Stays', 'j-arm with side stays'], ['Gable Mount + 10ft Pole', 'gable mount + 10ft pole'],
-  ['Bipod + 5ft Pole', 'bipod + 5ft pole'], ['Tripod + 10ft Pole', 'tripod + 10ft pole'], ['Tower Leg', 'Tower leg (within reach from ladder)'], 'Other'];
+  ['Bipod + 5ft Pole', 'bipod + 5ft pole'], ['Tripod + 10ft Pole', 'tripod + 10ft pole'], ['Tower', 'Tower'], 'Other'];
 function fwMountC() { return reuseMountC(FW_MOUNTS); }
 /* the mount type, with a Reused existing mount tick box always under it */
 function reuseMountC(list, noTick) {   // noTick: repairs, where a reused mount goes in the comments instead
-  var base = choiceC({ id: 'mount', label: 'Mount Type', options: list, cols: 2, out: false, otherLabel: 'Other Mount' });
-  function reusable() { return !!STATE.mount && STATE.mount !== 'Tower Leg'; }   // a tower leg is never new or reused
+  var base = choiceC({ id: 'mount', label: 'Mount Type', options: list, cols: 2, out: false, otherLabel: 'Other Mount',
+    afterChange: function (o) { if (o === 'Tower') { STATE.mount_into = 'Tower'; STATE.mount_pos = 'Tower'; } } });   // a tower mount is on a tower
+  function reusable() { return !!STATE.mount && STATE.mount !== 'Tower'; }   // a tower is never new or reused
   return {
     id: 'mount',
     render: function () {
@@ -1332,6 +1355,13 @@ function cpeTypeC(withPlat, repair) { return choiceC({ id: 'cpe', label: 'CPE Ty
 /* repair: a radio already on a tower may need a climb; installs and conversions never climb */
 function cpeAccessC(repair) { return choiceC({ id: 'cpe_access', label: 'CPE Access', cols: 2, otherLabel: 'Other Access', options:
   [['Serviceable from Ladder', 'Serviceable from ladder'], ['Stepping onto Roof Required', 'Stepping onto roof required']].concat(repair ? [['Tower Climb', 'Tower climb required']] : []).concat(['Other']) }); }
+/* the conversion type already names the new platform: fill it in (Move Conversion leaves it to the tech) */
+function convPlatform(o) {
+  var p = /to FWN/.test(o) ? 'FWN' : /to LTE/.test(o) ? 'LTE' : null;
+  if (!p) return;
+  STATE.fw_plat = p;
+  if (STATE.cpe && cpeOff(STATE.cpe)) delete STATE.cpe;
+}
 function fwPlatC() { return choiceC({ id: 'fw_plat', label: 'Platform', options: ['FWN', 'LTE'], cols: 2, afterChange: function () { if (STATE.cpe && (jobKey() === 'Repair|Fixed Wireless' ? cpeRepairOff : cpeOff)(STATE.cpe)) delete STATE.cpe; } }); }
 /* two short questions side by side */
 function pairC(a, b, tight, c) {
@@ -1344,6 +1374,31 @@ function pairC(a, b, tight, c) {
   };
 }
 function mountC(list) { return choiceC({ id: 'mount', label: 'Mount Type', options: list, cols: 2, out: 'Mount', otherLabel: 'Other Mount' }); }
+/* where the mount is: structure, surface, side, then position (installs and conversions) */
+var POSITIONS = [['Highest Peak', 'Highest peak'], 'Peak', ['Slope Side Edge', 'Slope side edge'], 'Tower', 'Wall', 'Other'];
+var POS_HIDE = { 'Roof': ['Tower', 'Wall'], 'Fascia': ['Slope Side Edge', 'Tower'] };   // positions that can't go with that surface
+function positionC(sat) {
+  function opts() { var hide = (POS_HIDE[STATE.mount_into] || []).concat(sat ? ['Tower'] : []); return POSITIONS.filter(function (o) { return hide.indexOf(optLabel(o)) < 0; }); }
+  function make() { return choiceC({ id: 'mount_pos', label: 'Position', out: 'Mount Position', options: opts(), show: posNeeded, cols: 3, otherLabel: 'Other Position' }); }
+  return { id: 'mount_pos', show: posNeeded,
+    render: function () { return make().render(); },
+    check: function (need, issues) { make().check(need, issues); },
+    out: function (m) { return make().out(m); } };
+}
+function mountPlaceComps(sat) {   // sat: no tower or wooden post for a dish
+  return [
+    choiceC({ id: 'structure', label: 'Structure', options: ['House', 'Garage', 'Shop', 'Barn', 'Trailer', 'Other'], cols: 3, otherLabel: 'Other Structure' }),
+    choiceC({ id: 'mount_into', label: 'Mounting Surface', options: ['Roof', 'Fascia', 'Wall'].concat(sat ? [] : ['Tower', ['Wooden Post', 'Wooden post']], [['Steel Pole', 'Steel pole'], 'Other']), cols: 2, out: 'Mounting Surface', otherLabel: 'Other Surface' }),
+    mountSideC(),
+    positionC(sat)
+  ];
+}
+/* which side of the structure, standing with your back to the road (the front faces the road) */
+/* a wall, post, pole or tower already says where the mount is: no Position needed */
+function posNeeded() { return ['Wall', 'Wooden Post', 'Steel Pole', 'Tower'].indexOf(STATE.mount_into) < 0; }
+function mountSideC() {
+  return choiceC({ id: 'mount_side', label: 'Side', out: 'Mount Side', options: ['Front', 'Back', 'Left', 'Right', 'Other'], cols: 3, otherLabel: 'Other Side' });
+}
 function mountLocC() { return textC({ id: 'mount_loc', label: 'Mount Location' }); }
 function heightC() { return readingC({ id: 'cpe_height', label: 'CPE Height', unit: 'ft', digits: 3, sign: 'none' }); }
 function groundSourceC() { return choiceC({ id: 'ground_src', label: 'Ground Source', options: GROUND_SOURCES, cols: 2, otherLabel: 'Other Ground Source' }); }
@@ -1496,7 +1551,208 @@ function vasSection() { return S('Value Added Services', vasComps()); }
 function commentsSection() { return { title: 'Additional Comments', heading: 'ADDITIONAL COMMENTS', optional: true, items: [commentsC()] }; }
 
 
+/* ---------- cannot complete (same form for every job type and platform, from the Cannot Complete JotForm) ---------- */
+var CC_REASONS = ['More Time Required', 'Charges Dispute - Extras', 'Charges Dispute - Mileage', 'Unable to Contact Customer / Customer Not Home',
+  'Reschedule', 'Extra Resource Required', 'Resources Issue', 'Network Outage / Maintenance', 'No Equipment in Stock', 'Customer Action Required',
+  'No Access to Site', 'Weather / Unsafe Work Conditions', 'Aerial Drop Required', 'Buried Drop Required', 'Temp Drop Required',
+  'Bucket Truck Required', 'Flaggers Required', 'Network Issue (FDH/MPT/ONT)', 'Splicing at House Required', 'Install Issue'];
+var CC_NO_SHOW = 'Unable to Contact Customer / Customer Not Home';
+var CC_DROP = ['Aerial Drop Required', 'Buried Drop Required', 'Temp Drop Required'];
+function ccNoShow() { return STATE.cc_reason === CC_NO_SHOW; }
+function ccDrop() { return CC_DROP.indexOf(STATE.cc_reason) >= 0; }
+function ccTempAsked() { return ccDrop() && STATE.cc_reason !== 'Temp Drop Required'; }
+function ccCco() { return STATE.cc_cco === 'Yes' || (ccTempAsked() && STATE.cc_temp === 'Temp Drop Not Viable'); }
+/* arrived and left times, typed with the phone's own time picker */
+function fmtTime(v) {
+  var m = /^(\d{1,2}):(\d{2})/.exec(v || ''); if (!m) return '';
+  var h = +m[1], ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+  return h + ':' + m[2] + ' ' + ap;
+}
+function siteTimesC() {
+  function box(key, label) {
+    var inp = el('input', { type: 'time', 'aria-label': label, class: 'time-input' });
+    inp.value = STATE[key] || '';
+    inp.addEventListener('input', function () { STATE[key] = inp.value; changed('cc_times', false); });
+    inp.addEventListener('change', function () { STATE[key] = inp.value; changed('cc_times', false); });
+    return el('div', {}, [el('p', { class: 'sub-q', style: 'margin-top:0', text: label }), inp]);
+  }
+  return {
+    id: 'cc_times', show: ccNoShow,
+    render: function () { return fieldWrap('cc_times', 'Arrived and Left Site Times', false, null, [el('div', { class: 'time-pair' }, [box('cc_arrived', 'Arrived'), box('cc_left', 'Left')])]); },
+    check: function (need) { need('cc_times', 'Arrived and Left Site Times', !!fmtTime(STATE.cc_arrived) && !!fmtTime(STATE.cc_left), 'Enter both times.'); },
+    out: function (m) { return ['On Site: ' + (fmtTime(STATE.cc_arrived) || m('cc_times', 'Arrived')) + ' until ' + (fmtTime(STATE.cc_left) || m('cc_times', 'Left'))]; }
+  };
+}
+function cannotCompleteForm() {
+  return [
+    S('Cannot Complete', [
+      choiceC({ id: 'cc_reason', label: 'Cannot Complete Reason', options: CC_REASONS, cols: 'list', out: 'Reason', gap: 'Reason' }),
+      textC({ id: 'cc_desc', label: 'Detailed Description', out: 'Description', multi: true })]),
+    S('Customer No Show', [
+      checklistC({ id: 'cc_noshow', label: 'Customer No Show Checklist', show: ccNoShow, out: 'No Show Checklist', allOut: 'All steps completed', whatMissing: "A few steps aren't ticked.", items: [
+        'Called customer and left VM this morning to confirm appointment', 'Called when departing to SA', 'Called customer when arrived on site',
+        'Had dispatch attempt to contact customer', 'Waited 15 minutes after dispatch attempted to reach customer', 'Uploaded photo of house to FSL'] }),
+      siteTimesC()]),
+    S('Drop', [
+      choiceC({ id: 'cc_temp', label: 'Was a Temp Drop Offered', show: ccTempAsked, cols: 2, out: 'Temp Drop', options: [
+        ['Offered, Customer Refused', 'Offered temp drop, customer refused'], ['Temp Drop Not Viable', 'Temp drop not viable']] }),
+      choiceC({ id: 'cc_cco', label: 'CCO Ticket Created', show: ccDrop, options: ['Yes', 'No'], cols: 2, out: 'CCO Ticket Created' }),
+      textC({ id: 'cc_cco_desc', label: 'CCO Description', out: 'CCO Description', multi: true, show: function () { return ccDrop() && ccCco(); } })]),
+    commentsSection()
+  ];
+}
+
+/* ---------- not required: the customer cancelled and we're never going back (from the Not Required JotForm) ---------- */
+var NR_REASONS = ['Landlord Permission Declined', 'Equipment / Install Objection', 'Refused Long Drop Charges', 'Customer Has Further Sales Questions',
+  'Competitor & Retention - Price', 'Competitor & Retention - Speed', 'Competitor Contract', 'Customer Cancelled - Refused to Provide Reason'];
+var NR_SRNM = 'Signal Requirements Not Met', NR_FW_NLOS = 'NLOS - No Serviceable Signal', NR_SAT_NLOS = 'NLOS - No Clear Line of Sight';
+function nrAttempt() { return STATE.job_type === 'Install' || STATE.job_type === 'Conversion'; }
+function nrReasons() {
+  var extra = [];
+  if (nrAttempt() && STATE.job_plat === 'Fixed Wireless') extra = [[NR_SRNM, 'Signal requirements not met - QOI met for a lower speed plan but customer refused'], [NR_FW_NLOS, 'NLOS - No serviceable signal found for any package to any panel']];
+  if (nrAttempt() && STATE.job_plat === 'Satellite') extra = [[NR_SAT_NLOS, 'NLOS - No viable installation options with clear LOS to an open satellite beam']];
+  return extra.concat(NR_REASONS);
+}
+function nrFwSignal() { return STATE.nr_reason === NR_SRNM || STATE.nr_reason === NR_FW_NLOS; }
+function nrSatNlos() { return STATE.nr_reason === NR_SAT_NLOS; }
+/* tick any that apply, with Other typed in */
+function multiC(o) {
+  function on(k) { return !!(STATE[o.id] && STATE[o.id][k] === true); }
+  return {
+    id: o.id, show: o.show,
+    render: function () {
+      var g = el('div', { class: 'checks-col', 'data-multi': '1' });
+      o.options.forEach(function (opt) {
+        var k = optLabel(opt), sel = on(k);
+        g.appendChild(el('button', { type: 'button', class: 'check', role: 'checkbox', 'aria-checked': sel ? 'true' : 'false',
+          onclick: function () { var t = Object.assign({}, STATE[o.id] || {}); t[k] = !sel; STATE[o.id] = t; changed(o.id, true); } },
+          [el('span', { class: 'box', text: sel ? '✓' : '' }), el('span', { text: k })]));
+      });
+      var controls = [g];
+      if (on('Other')) controls.push(otherInput(o.id + '_other', o.id, 'Other'));
+      return fieldWrap(o.id, o.label, false, 'Tick all that apply.', controls);
+    },
+    check: function (need) {
+      var any = o.options.some(function (opt) { return on(optLabel(opt)); });
+      need(o.id, o.label, any && (!on('Other') || !!str(STATE[o.id + '_other'])), any ? 'Describe Other.' : 'Tick at least one.');
+    },
+    out: function (m) {
+      var picked = o.options.filter(function (opt) { return on(optLabel(opt)); }).map(function (opt) {
+        return optLabel(opt) === 'Other' ? (str(STATE[o.id + '_other']) || m(o.id, 'Other')) : (Array.isArray(opt) ? opt[1] : opt);
+      });
+      return [(o.out || o.label) + ': ' + (picked.length ? picked.join(', ') : m(o.id, o.label))];
+    }
+  };
+}
+var SPEEDS = ['25x3', '50x5', '50x10', '100x5', '100x10', '250x25', '500x50'];
+var STRUCTURE_TYPES = ['Single Story Home', 'Two Story Home', 'Trailer', 'Steel Outbuilding', 'Apartment / Condo Building', 'Commercial Building', 'Other'];
+var ROOF_TYPES = ['Asphalt Shingle', 'Steel', 'Fibreglass Trailer', 'Flat', 'Other'];
+function nrStructureComps(show) {
+  return [choiceC({ id: 'nr_structure', label: 'Structure Type', options: ['House', 'Garage', 'Shop', 'Barn', 'Trailer', 'Other'], cols: 3, otherLabel: 'Other Structure', show: show })];
+}
+/* every tower tested on a signal not required: tower, platform, cell ID and readings (or No Signal Found), and a testing note */
+var TOWER_MAX = 8;
+function towerCount() { var n = +STATE.t_count || 1; return Math.max(1, Math.min(TOWER_MAX, n)); }
+function towerTestsC() {
+  function k(i, f) { return 't' + i + '_' + f; }
+  function noSig(i) { return STATE[k(i, 'nosig')] === true; }
+  function parts(i) {
+    return {
+      tower: textC({ id: k(i, 'tower'), label: 'Tower' }),
+      plat: choiceC({ id: k(i, 'plat'), label: 'Platform', options: ['FWN', 'LTE'], cols: 2 }),
+      cell: textC({ id: k(i, 'cell'), label: 'Cell ID' }),
+      rsrp: readingC({ id: k(i, 'rsrp'), label: 'RSRP', unit: 'dBm', digits: 3, sign: 'minus' }),
+      sinr: readingC({ id: k(i, 'sinr'), label: 'SINR', unit: 'dB', digits: 2, sign: 'none' }),
+      notes: textC({ id: k(i, 'notes'), label: 'Testing Notes' })
+    };
+  }
+  function removeTower(i) {
+    var n = towerCount();
+    for (var j = i; j < n; j++) ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'notes'].forEach(function (f) { STATE[k(j, f)] = STATE[k(j + 1, f)]; });
+    ['tower', 'plat', 'cell', 'rsrp', 'sinr', 'nosig', 'notes'].forEach(function (f) { delete STATE[k(n, f)]; });
+    STATE.t_count = n - 1; changed('towers', true);
+  }
+  return {
+    id: 'towers',
+    render: function () {
+      var n = towerCount(), wrap = el('div', { class: 'field', 'data-field-id': 'towers' });
+      for (var i = 1; i <= n; i++) (function (i) {
+        var p = parts(i), card = el('div', { class: 'tower-card', 'data-anim': 'tower' + i });
+        card.appendChild(el('div', { class: 'tower-card-head' }, [el('span', { text: i === 1 ? 'Best Option Found' : 'Tower ' + i }),
+          n > 1 ? el('button', { type: 'button', text: 'Remove', onclick: function () { removeTower(i); } }) : null]));
+        card.appendChild(el('div', { class: 'field-pair' }, [p.tower.render(), p.plat.render()]));
+        card.appendChild(miniCheck(k(i, 'nosig'), 'No signal found'));
+        if (!noSig(i)) card.appendChild(el('div', { class: 'field-pair' }, [p.cell.render(), el('div', { class: 'field-pair tight mini' }, [p.rsrp.render(), p.sinr.render()])]));
+        var notes = p.notes.render(); notes.querySelector('.q').appendChild(el('span', { class: 'opt', text: ' (optional)' }));
+        card.appendChild(notes);
+        wrap.appendChild(card);
+      })(i);
+      if (n < TOWER_MAX) wrap.appendChild(el('button', { type: 'button', class: 'choice add-tower', onclick: function () { STATE.t_count = n + 1; changed('towers', true); } }, [el('span', { text: '+ Add Another Tower' })]));
+      return wrap;
+    },
+    check: function (need, issues) {
+      for (var i = 1; i <= towerCount(); i++) {
+        var p = parts(i);
+        p.tower.check(need, issues); p.plat.check(need, issues);
+        if (!noSig(i)) { p.cell.check(need, issues); p.rsrp.check(need, issues); p.sinr.check(need, issues); }
+      }
+    },
+    out: function (m) {
+      var l = ['Towers Tested:'];
+      for (var i = 1; i <= towerCount(); i++) {
+        var t = str(STATE[k(i, 'tower')]) || m(k(i, 'tower'), 'Tower'), pl = STATE[k(i, 'plat')] || m(k(i, 'plat'), 'Platform');
+        var sig = noSig(i) ? 'No signal found' : 'Cell ID ' + (str(STATE[k(i, 'cell')]) || m(k(i, 'cell'), 'Cell ID')) +
+          ', RSRP ' + (str(STATE[k(i, 'rsrp')]) ? '-' + str(STATE[k(i, 'rsrp')]) + ' dBm' : m(k(i, 'rsrp'), 'RSRP')) +
+          ', SINR ' + (str(STATE[k(i, 'sinr')]) ? str(STATE[k(i, 'sinr')]) + ' dB' : m(k(i, 'sinr'), 'SINR'));
+        var note = str(STATE[k(i, 'notes')]);
+        l.push('- ' + (i === 1 ? 'Best option found: ' : '') + cap(t) + ' (' + pl + '): ' + sig + (note ? ' - ' + note : ''));
+      }
+      return l;
+    }
+  };
+}
+function notRequiredForm() {
+  function srnm() { return STATE.nr_reason === NR_SRNM; }
+  return [
+    S('Not Required', [
+      { id: 'nr_reason', render: function () { return choiceC({ id: 'nr_reason', label: 'Not Required Reason', options: nrReasons(), cols: 'list', out: 'Reason', gap: 'Reason' }).render(); },
+        check: function (need, issues) { choiceC({ id: 'nr_reason', label: 'Not Required Reason', options: nrReasons(), out: 'Reason', gap: 'Reason' }).check(need, issues); },
+        out: function (m) { return choiceC({ id: 'nr_reason', label: 'Not Required Reason', options: nrReasons(), out: 'Reason', gap: 'Reason' }).out(m); } },
+      choiceC({ id: 'nr_qoi', label: 'QOI Met For', options: SPEEDS.slice(0, 6), cols: 3, show: srnm }),
+      choiceC({ id: 'nr_min', label: 'Minimum Speed Customer Will Accept', out: 'Minimum Speed Accepted', options: SPEEDS.slice(1), cols: 3, show: srnm }),
+      { id: 'nr_desc', show: function () { return !nrFwSignal(); },
+        render: function () { var w = textC({ id: 'nr_desc', label: nrSatNlos() ? 'Comments' : 'Detailed Description', multi: true }).render();
+          if (nrSatNlos()) { var h = w.querySelector('.hint'); if (h) h.textContent = 'Which satellite platforms and beams were tested, what is blocking clear LOS, mounting challenges, anything else relevant.'; }
+          return w; },
+        check: function (need, issues) { textC({ id: 'nr_desc', label: 'Detailed Description', multi: true }).check(need, issues); },
+        out: function (m) { return textC({ id: 'nr_desc', label: 'Detailed Description', out: 'Description', multi: true }).out(m); } }]),
+    S('Towers Tested', [towerTestsC()].map(function (c) { c.show = nrFwSignal; return c; })),
+    S('Testing', [
+      pairC(textC({ id: 'test_loc', label: 'Testing Location' }), readingC({ id: 'test_height', label: 'Testing Height', unit: 'ft', digits: 3, sign: 'none' })),
+      choiceC({ id: 'test_cpe', label: 'CPE Used for Testing', options: ['Pro Max', 'Next-Gen 5G', 'CAT12 LTE'], cols: 3 }),
+      choiceC({ id: 'no_promax', label: 'Why Pro Max Was Not Used', out: 'Pro Max Not Used', cols: 2, otherLabel: 'Other Reason', show: function () { return nrFwSignal() && !!STATE.test_cpe && STATE.test_cpe !== 'Pro Max'; }, options: [
+        ['RSRP Failing QOI by Over 10dBm', 'RSRP failing QOI by over 10dBm, did not test with Pro Max'], ['Pro Max Not Stocked', 'Pro Max radio not stocked'], 'Other'] }),
+      choiceC({ id: 'pole_test', label: '10ft Pole Testing', cols: 2, otherLabel: 'Other Pole Testing', options: [
+        ['Tested, Not Enough Improvement', 'Tested with 10ft pole at highest roof peak - insufficient signal improvement to meet QOI'],
+        ['QOI Met, Customer Refused Mounts', 'QOI met with 10ft pole - customer refused Gable Mount and Tripod'],
+        ['Not Tested, Mounts Not Possible', 'Did not test with 10ft pole - Gable Mount and Tripod Mount installation not possible on structure'], 'Other'] }),
+      multiC({ id: 'poor_signal', label: 'Poor Signal Due To', options: [
+        ['Nearby Foliage Blocking LOS', 'Nearby foliage blocking LOS'], ['Distant Foliage Blocking LOS', 'Distant foliage blocking LOS'],
+        ['Low Elevation at Customer Location', 'Low elevation at customer location'], ['Unavoidable Structures Blocking LOS', 'Unavoidable structures blocking LOS'],
+        ['Interference Causing Poor SINR', 'Interference causing poor SINR'], ['Edge of Sector Causing Poor SINR', 'Located on edge of sector causing poor SINR'], 'Other'] }),
+    ].map(function (c) { if (!c.show) c.show = nrFwSignal; return c; })),
+    S('Structure', nrStructureComps(function () { return nrFwSignal() || nrSatNlos(); })),
+    S('Pivot', [choiceC({ id: 'pivot', label: 'Pivot Options Offered', cols: 2, otherLabel: 'Other Pivot', show: nrFwSignal, options: [
+      ['Offered Satellite, Customer Declined', 'Offered satellite, customer declined'], ['No Open Beams, Satellite Not Offered', 'Did not offer satellite, no open beams available'],
+      ['Beams Available but NLOS', 'Did not offer satellite, beams available and customer interested but NLOS'], ['Customer Currently on LTE', 'Customer currently serviced with LTE'],
+      ['Customer Currently on Satellite', 'Customer currently serviced with satellite'], 'Other'] })]),
+    commentsSection()
+  ];
+}
+
 var FORMS = {
+  'Not Required': notRequiredForm,
+  'Cannot Complete': cannotCompleteForm,
   'New Install|Fibre (Existing Drop)': function () {
     return [S('Outdoor', [nidC(), connectorC()]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
       S('Confirmations', [xapC(FIBRE_XAP), lawnC()])];
@@ -1517,9 +1773,7 @@ var FORMS = {
   'New Install|Fixed Wireless': function () {
     return [
       S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(), sinrC(), 'tight mini'), null), cpeTypeC(true)]),
-      S('Mount', [fwMountC(),
-        choiceC({ id: 'mount_into', label: 'Mounting Surface', options: [['Asphalt Shingle Roof', 'Asphalt shingle roof'], ['Fascia', 'Fascia'], ['Wall', 'Wall'], ['Tower', 'Tower'], 'Other'], cols: 2, out: 'Mounting Surface', otherLabel: 'Other Surface' }),
-        pairC(mountLocC(), heightC()), cpeAccessC()]),
+      S('Mount', [fwMountC()].concat(mountPlaceComps(), [heightC(), cpeAccessC()])),
       S('Cabling and Grounding', [
         choiceC({ id: 'cabling', label: 'Cabling', options: [['New Xplore Standard Cabling', 'Installed new Xplore standard cabling'], 'Other'], cols: 2,
           otherLabel: 'Why Were Xplore Standards Not Met', otherOut: function (r) { return 'Xplore standards not met, ' + r; } }),
@@ -1531,10 +1785,10 @@ var FORMS = {
   },
   'Conversion|Fixed Wireless': function () {
     return [
-      S('Conversion', [choiceC({ id: 'conv_type', label: 'Conversion Type', cols: 2, out: 'Conversion', options: [
+      S('Conversion', [choiceC({ id: 'conv_type', label: 'Conversion Type', cols: 2, out: 'Conversion', afterChange: convPlatform, options: [
         ['LTE to FWN, Same Tower', 'LTE to FWN to same tower'], ['LTE to FWN, New Tower', 'LTE to FWN to new tower'], ['SAT to FWN', 'SAT to FWN'], ['SAT to LTE', 'SAT to LTE'], ['Move Conversion', 'Move conversion']] })]),
       S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(), sinrC(), 'tight mini'), null), cpeTypeC(true)]),
-      S('Mount', [fwMountC(), pairC(mountLocC(), heightC()), cpeAccessC()]),
+      S('Mount', [fwMountC()].concat(mountPlaceComps(), [heightC(), cpeAccessC()])),
       S('Cabling and Grounding', fwSwapCabling()),
       S('Indoor', [powerC(), routerC()]),
       S('Old Equipment', [choiceC({ id: 'recovery', label: 'Original CPE', cols: 0, out: 'Recovery', otherLabel: 'Recovery Details', options: [
@@ -1553,7 +1807,7 @@ var FORMS = {
   'Repair|Fixed Wireless': function () {
     return [
       S('Repair', repairComps()),
-      S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(true), sinrC(true), 'tight mini'), textC({ id: 'cell_id', label: 'Cell ID' })), cpeTypeC(true, true)]),
+      S('Signal', [pairC(towerC(), fwPlatC()), pairC(textC({ id: 'cell_id', label: 'Cell ID' }), pairC(rsrpC(true), sinrC(true), 'tight mini')), cpeTypeC(true, true)]),
       S('Mount', [reuseMountC(FW_MOUNTS, true), pairC(mountLocC(), heightC()), cpeAccessC(true)]),
       S('Cabling and Grounding', fwSwapCabling()),
       S('Indoor', [powerC(), routerC()]), commentsSection(),
@@ -1581,7 +1835,7 @@ function satForm(install) {
   var conf = [lawnC()];
   if (install) conf.unshift(xapC(SAT_XAP));
   return [
-    S('Mount', [reuseMountC(SAT_MOUNTS), mountLocC(), cpeAccessC()]),
+    S('Mount', [reuseMountC(SAT_MOUNTS)].concat(mountPlaceComps(true), [cpeAccessC()])),
     S('Cabling and Grounding', [
       choiceC({ id: 'cabling', label: 'Cabling', options: [['New Xplore Standard Cabling', 'Installed new Xplore standard cabling'], 'Other'], cols: 2,
         otherLabel: 'Why Were Xplore Standards Not Met', otherOut: function (r) { return 'Xplore standards not met, ' + r; } }),
@@ -1603,20 +1857,22 @@ var PICK_TYPES = ['Install', 'Conversion', 'Repair'];
 var PICK_PLATS = ['Fibre', 'Fixed Wireless', 'Satellite', 'Value Added Services'];
 var PICK_OUTCOMES = ['Complete', 'Cannot Complete', 'Not Required'];
 var PICK_DROPS = ['Existing Drop', 'Drop Required', 'Drop Only'];
-var SOON = { 'Cannot Complete': true, 'Not Required': true };   // forms still to come: shown greyed out
-function needsDrop(st) { st = st || STATE; return st.job_plat === 'Fibre' && (st.job_type === 'Install' || st.job_type === 'Conversion'); }
+var SOON = {};   // forms still to come are listed here and shown greyed out   // forms still to come: shown greyed out
+function needsDrop(st) { st = st || STATE; return st.job_plat === 'Fibre' && (st.job_type === 'Install' || st.job_type === 'Conversion') && st.job_outcome === 'Complete'; }
 function dropOff(o, st) { st = st || STATE; return o === 'Drop Only' && st.job_type !== 'Install'; }   // drop only is an install job
 function platOff(o, st) { st = st || STATE; return o === 'Value Added Services' && st.job_type === 'Conversion'; }   // no VAS conversion form
 function jobKey() {
   var t = STATE.job_type, p = STATE.job_plat;
-  if (PICK_TYPES.indexOf(t) < 0 || PICK_PLATS.indexOf(p) < 0 || STATE.job_outcome !== 'Complete' || platOff(p)) return null;
+  if (PICK_TYPES.indexOf(t) < 0 || PICK_PLATS.indexOf(p) < 0 || platOff(p)) return null;
+  if (STATE.job_outcome === 'Cannot Complete' || STATE.job_outcome === 'Not Required') return STATE.job_outcome;   // one form each for every job type and platform
+  if (STATE.job_outcome !== 'Complete') return null;
   var svc = p === 'Value Added Services' ? 'VAS' : p;
   if (needsDrop()) { if (PICK_DROPS.indexOf(STATE.job_drop) < 0 || dropOff(STATE.job_drop)) return null; svc = 'Fibre (' + STATE.job_drop + ')'; }
   var k = (t === 'Install' ? 'New Install' : t) + '|' + svc;
   return FORMS[k] ? k : null;
 }
 function platLabel(st) { st = st || STATE; return st.job_plat === 'Fibre' && needsDrop(st) && st.job_drop ? 'Fibre (' + st.job_drop + ')' : st.job_plat; }
-function jobTitle() { return jobKey() ? STATE.job_type + ' — ' + platLabel() : ''; }
+function jobTitle() { return jobKey() ? STATE.job_type + ' — ' + platLabel() + (STATE.job_outcome === 'Complete' ? '' : ' — ' + STATE.job_outcome) : ''; }
 function currentSections() { var k = jobKey(); return k ? FORMS[k]() : []; }
 function visible(c) { return !c.show || c.show(); }
 /* jobs saved by older versions used one Job Type and a Service */
@@ -2124,6 +2380,24 @@ function initSettings() {
 
 /* ===================== change log (opened from the version number in the footer; newest first) ===================== */
 var CHANGELOG = [
+  { v: '2.13.2', d: 'Nov 6, 2026', items: ['The minus sign for RSRP and Light Level Reading now sits inside the box.', 'Cannot Complete and Not Required reasons are a compact, left-aligned list.', 'Towers Tested: the first card is the Best Option Found.'] },
+  { v: '2.13.1', d: 'Nov 6, 2026', items: [
+    'Cannot Complete and Not Required reasons are one list.',
+    'Signal not required: log every tower tested (tower, platform, cell ID, RSRP, SINR or No Signal Found, and a note). Add Another Tower for more.',
+    'Structure Type matches the rest of the app; Roof Type and the Also Tested box are gone; Pivot Options are regular buttons.',
+    'Fixed Wireless repair: Cell ID on the left, RSRP and SINR on the right.'
+  ] },
+  { v: '2.13.0', d: 'Nov 6, 2026', items: ['New outcome: Not Required, for a customer who cancelled. Pick the reason and describe it (from the Not Required JotForm).', 'Fixed Wireless installs and conversions add Signal Requirements Not Met and NLOS, with the best signal found, testing, structure and pivot questions.', 'Satellite installs and conversions add NLOS - No Clear Line of Sight, with structure and roof type.'] },
+  { v: '2.12.0', d: 'Nov 6, 2026', items: [
+    'New outcome: Cannot Complete, one form for every job type and platform (from the Cannot Complete JotForm).',
+    'Pick the reason and describe it. Customer Not Home adds the no show checklist and site times; a drop reason asks about the temp drop and CCO ticket.'
+  ] },
+  { v: '2.11.2', d: 'Nov 6, 2026', items: ['Fixed Wireless conversion: picking the Conversion Type fills in the Platform (FWN or LTE).'] },
+  { v: '2.11.1', d: 'Nov 6, 2026', items: [
+    'Structure, Mounting Surface, Side and Position now also on Fixed Wireless conversion and Satellite install and conversion.',
+    'Position only lists what fits the surface: Roof drops Tower and Wall; Fascia drops Slope Side Edge and Tower.', 'Satellite: no Tower or Wooden Post for Mounting Surface, and no Tower for Position.'
+  ] },
+  { v: '2.11.0', d: 'Nov 6, 2026', items: ['Fixed Wireless install: Mount Location is now Structure, Mounting Surface, Side (Front, Back, Left or Right) and Position, each with Other.', 'Structure adds Shop; Mounting Surface adds Wooden Post and Steel Pole.', 'Position is now Highest Peak, Peak, Slope Side Edge, Tower, Wall or Other, and is skipped when the Mounting Surface is Wall, Wooden Post, Steel Pole or Tower.', 'Mounting Surface: Asphalt Shingle Roof is now just Roof.', 'Mount Type Tower Leg is now just Tower; picking it fills in Tower for Mounting Surface.'] },
   { v: '2.10.1', d: 'Nov 6, 2026', items: ['Fixed Wireless repair and conversion: Cabling, Surge Suppressor and Grounding use regular buttons with clearer wording.', 'Fixed Wireless: RSRP and SINR boxes stretch to fill half the row on every form.'] },
   { v: '2.10.0', d: 'Nov 6, 2026', items: ['Value Added Services repair: tick XWR, XWH and/or XTV, then give the floor and room for each.', 'Satellite repair: Point and Peak uses the same buttons as everything else.', 'CPE Access: Tower Climb only shows on repairs.', 'Fixed Wireless repair: Final RSRP and Final SINR sit on the same row as Cell ID.'] },
   { v: '2.9.9', d: 'Nov 6, 2026', items: [
