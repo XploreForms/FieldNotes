@@ -1,4 +1,4 @@
-const CACHE = 'fsl-comments-v2.7.2';
+const CACHE = 'fsl-comments-v2.10.1';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

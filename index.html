@@ -27,11 +27,10 @@
     });
   } catch (e) {}
 })();
-/* colour mode before the first paint: a saved Light or Dark wins, otherwise follow the phone */
+/* colour mode before the first paint: light by default (Settings, and the saved Light / Dark / OLED choices, are switched off for now) */
 (function () {
   var t = null, o = false;
-  try { t = localStorage.getItem('xplore_fsl_theme'); o = localStorage.getItem('xplore_fsl_oled') === 'on'; } catch (e) {}
-  if (t !== 'light' && t !== 'dark') t = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  if (t !== 'light' && t !== 'dark') t = 'light';   // light (white background) by default
   document.documentElement.setAttribute('data-theme', t);
   if (o) document.documentElement.setAttribute('data-oled', 'on');
   var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', o && t === 'dark' ? '#000000' : '#002B2B');
@@ -177,6 +176,23 @@ input:focus, textarea:focus, .choice:focus-visible, .link-btn:focus-visible, but
 .other-input .sub-q { margin-top: 0; }
 
 .unit-row { display: flex; align-items: center; gap: 0.6rem; }
+.field-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 0.9rem; }
+.field-pair > .field { min-width: 0; }
+.field-pair.under-right > .field:nth-child(3) { grid-column: 2; }   /* e.g. Cell ID under Platform */
+.field-pair.tight { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 0.8rem; }   /* readings sit close together, wrapping on very narrow phones */
+.field-pair.tight > .field { flex: 0 0 auto; }
+.field-pair.tight > .field input[type="text"]:not(.light-input) { width: 6.5rem; }
+.field-pair.tight .unit-row input.light-input { flex-basis: 4rem; width: 4rem; }
+.field-pair > .field-pair { min-width: 0; }
+.field-pair.mini { flex-wrap: nowrap; gap: 0 0.6rem; }   /* two readings squeezed into half a row */
+.field-pair.mini .unit-row { gap: 0.25rem; }
+.field-pair.mini > .field { flex: 1 1 auto; min-width: 0; }   /* the two readings share the half row */
+.field-pair.mini .unit-row input.light-input { flex: 1 1 auto; width: 2.7rem; min-width: 2.7rem; padding-left: 0.2rem; padding-right: 0.2rem; }
+.field-pair.mini .unit-row .prefix, .field-pair.mini .unit-row .suffix { font-size: 0.9rem; }
+.field-pair.mini .q { white-space: nowrap; }
+.field-pair .unit-row { gap: 0.4rem; }
+.field-pair .unit-row input.light-input { flex: 0 1 4.6rem; width: 4.6rem; min-width: 3.2rem; }
+.field-pair .hint { display: none; }
 .unit-row .prefix, .unit-row .suffix { font-weight: 600; font-size: 1.05rem; }
 .unit-row input.light-input { flex: 0 0 6rem; width: 6rem; text-align: center; font-size: 1.05rem; font-weight: 400; padding: 0.85rem 0.4rem; }
 
@@ -434,7 +450,7 @@ footer.app-footer button.ver-link { font: inherit; color: inherit; background: n
 .footer-note { max-width: 30rem; margin: 0.2rem auto 0; font-size: 0.7rem; line-height: 1.45; opacity: 0.85; }
 .settings-btn { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.75rem; padding: 0 1rem; margin-bottom: 0.4rem; border-radius: 1.4rem; font: 600 0.85rem var(--xp-font); color: var(--xp-white); background: var(--xp-carmanah); border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .settings-panel { max-width: 22rem; margin: 0.2rem auto 0.8rem; padding: 0.8rem 0.9rem 0.6rem; border-radius: 1rem; background: var(--xp-carmanah); color: var(--xp-white); text-align: left; font-size: 0.9rem; animation: xp-pop-in 0.18s ease-out; }
-.settings-panel[hidden] { display: none; }
+.settings-panel[hidden], .settings-btn[hidden] { display: none; }
 .settings-group { margin: 0 0 0.45rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
 .settings-panel .choices { gap: 0.4rem; margin-bottom: 0.3rem; }
 .settings-panel .choice { min-height: 2.75rem; font-size: 0.85rem; background: var(--xp-dark); }
@@ -549,6 +565,22 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
 :root[data-theme="light"] .sign-btn { background: var(--xp-dark); color: var(--xp-white); }
 .job-section .form-section-title { margin-bottom: 0.9rem; }
 .job-field .choices.cols-3 .choice { font-size: 0.95rem; }
+.job-field .sub-q.first { margin-top: 0; }
+.choice:disabled { opacity: 0.35; cursor: not-allowed; }
+.choice:disabled:active { background: inherit; color: inherit; }
+/* until the job is picked: grey placeholder sections where the questions will load */
+.ghost-form { margin-top: 0.4rem; pointer-events: none; user-select: none; -webkit-user-select: none; }
+.ghost-note { margin: 0 0 1.2rem; opacity: 0.6; font-size: 0.95rem; }
+.ghost-sec { margin-bottom: 1.6rem; opacity: 0.5; animation: ghost-in 0.5s ease-out both; }
+.ghost-sec:nth-of-type(3) { animation-delay: 0.08s; } .ghost-sec:nth-of-type(4) { animation-delay: 0.16s; }
+.ghost-title { font-weight: 700; font-size: 1.05rem; padding-bottom: 0.45rem; margin-bottom: 0.8rem; border-bottom: 2px solid currentColor; opacity: 0.55; }
+.ghost-pills { display: flex; gap: 0.6rem; margin-bottom: 0.7rem; }
+.ghost-pill { flex: 1; height: 2.6rem; border-radius: 0.8rem; background: rgba(120,140,130,0.28); }
+.ghost-bars { display: grid; gap: 0.55rem; margin-bottom: 0.9rem; }
+.ghost-bar { display: block; height: 0.9rem; border-radius: 0.45rem; background: rgba(120,140,130,0.28); }
+.ghost-bar.short { width: 60%; }
+@keyframes ghost-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 0.5; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ghost-sec { animation: none; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
 </style>
 </head>
@@ -574,7 +606,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
   <main id="form-mount"></main>
 
   <section id="preview" class="preview-card" aria-label="Your comment">
-    <h2>Your Comment</h2>
+    <h2>FSL Comment</h2>
     <div id="progress" class="progress" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <div id="output-box"></div>
     <div class="preview-foot">
@@ -584,7 +616,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
   </section>
 
   <footer class="app-footer">
-    <button type="button" id="settings-btn" class="settings-btn" aria-expanded="false" aria-controls="settings-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h10M18 18h2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg><span>Settings</span></button>
+    <button type="button" id="settings-btn" class="settings-btn" hidden aria-expanded="false" aria-controls="settings-panel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h10M18 18h2"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="16" cy="18" r="2"/></svg><span>Settings</span></button>
     <div id="settings-panel" class="settings-panel" role="group" aria-label="Settings" hidden>
       <p class="settings-group">Colour Mode</p>
       <div id="theme-choices" class="choices cols-3" role="radiogroup" aria-label="Colour mode"></div>
@@ -595,7 +627,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
         <span class="ts-label">Retro Mode</span><span class="ts-track"><span class="ts-knob"></span></span>
       </button>
     </div>
-    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.7.2</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
+    <div class="footer-text">Xplore &middot; Field Notes &middot; <button type="button" class="ver-link" title="What's new">v2.10.1</button> &middot; <button type="button" class="ver-link name-link">Add your name</button></div>
   </footer>
 </div>
 
@@ -611,7 +643,7 @@ header.app-header .header-top img.yawn { transform-origin: 50% 100%; animation: 
 <div id="dialog-mount"></div>
 
 <script>
-var APP_VERSION = '2.7.2';
+var APP_VERSION = '2.10.1';
 /* ===================== helpers ===================== */
 function $(id) { return document.getElementById(id); }
 
@@ -717,7 +749,7 @@ function fieldWrap(id, label, optional, hint, controls) {
   return wrap;
 }
 
-function choiceGroup(key, options, cols, fieldId, afterChange) {
+function choiceGroup(key, options, cols, fieldId, afterChange, off) {
   var group = el('div', { class: 'choices' + (cols ? ' cols-' + cols : ''), role: 'radiogroup' });
   options.forEach(function (o) {
     var selected = STATE[key] === o;
@@ -730,6 +762,7 @@ function choiceGroup(key, options, cols, fieldId, afterChange) {
         changed(fieldId, true);
       }
     }, [el('span', { class: 'mark', text: selected ? '✓' : '' }), el('span', { text: o })]);
+    if (off && off(o)) { btn.disabled = true; btn.setAttribute('aria-disabled', 'true'); }   // greyed out, kept in place for muscle memory
     group.appendChild(btn);
   });
   return group;
@@ -782,7 +815,7 @@ function locationField(id, key, label, rooms, extra) {
   return card;
 }
 /* Small optional tick: only used when the customer insists on their own router. Off = Xplore router. */
-function ownRouterCheck() { return miniCheck('own_router', 'Customer chose to use their own router'); }
+function ownRouterCheck() { return miniCheck('own_router', 'Customer using their own router'); }
 function locationDone(key) {
   return !!STATE[key + '_floor'] && !!STATE[key] && (STATE[key] !== 'Other' || !!str(STATE[key + '_other']));
 }
@@ -800,7 +833,7 @@ function lightNeedsCheck() { var lp = parseLight(STATE.light); return lp !== nul
 function lightBlock() {
   var id = 'light';
   if (STATE.light !== undefined) STATE.light = cleanLight(STATE.light);   // tidy anything saved by an older version
-  var inp = el('input', { type: 'text', inputmode: 'numeric', pattern: '[0-9]*', maxlength: '2', class: 'light-input', 'aria-label': 'Final light level, number only', autocomplete: 'off' });
+  var inp = el('input', { type: 'text', inputmode: 'numeric', pattern: '[0-9]*', maxlength: '2', class: 'light-input', 'aria-label': 'Light level reading, number only', autocomplete: 'off' });
   inp.value = STATE.light || '';
   var warn = el('div', {});
   function updateWarn() {
@@ -861,7 +894,7 @@ function lightBlock() {
   var row = el('div', { class: 'unit-row' }, [el('span', { class: 'prefix', text: '−' }), inp, el('span', { class: 'suffix', text: 'dBm' })]);
   var e = errFor(id);
   var wrap = el('div', { class: 'field light-block' + (e ? ' has-error' : ''), 'data-field-id': id }, [
-    el('p', { class: 'sub-q', style: 'margin-top:0', text: 'Final Light Level' }), row, warn
+    el('p', { class: 'sub-q', style: 'margin-top:0', text: 'Light Level Reading' }), row, warn
   ]);
   if (e) wrap.appendChild(el('div', { class: 'field-error-msg', text: e.msg }));
   var frag = document.createDocumentFragment();
@@ -948,16 +981,16 @@ function choiceC(o) {
   return {
     id: o.id, show: o.show,
     render: function () {
-      var controls = [choiceGroup(o.id, labels, o.cols, o.id)];
+      var controls = [choiceGroup(o.id, labels, o.cols, o.id, o.afterChange, o.off)];
       if (STATE[o.id] === 'Other') controls.push(otherInput(o.id + '_other', o.id, o.otherLabel || 'Other ' + o.label));
       return fieldWrap(o.id, o.label, false, null, controls);
     },
-    done: function () { return labels.indexOf(STATE[o.id]) >= 0 && (STATE[o.id] !== 'Other' || !!str(STATE[o.id + '_other'])); },
+    done: function () { return labels.indexOf(STATE[o.id]) >= 0 && !(o.off && o.off(STATE[o.id])) && (STATE[o.id] !== 'Other' || !!str(STATE[o.id + '_other'])); },
     check: function (need) { need(o.id, o.label, this.done(), o.msg || (labels.indexOf('Other') >= 0 ? 'Choose an answer, or type it if you chose Other.' : 'Please choose an answer.')); },
     value: function (m) {
       var opt = optFind(o.options, STATE[o.id]);
-      if (!opt) return m(o.id, o.gap || o.label);
-      if (STATE[o.id] === 'Other') return str(STATE[o.id + '_other']) ? cap(STATE[o.id + '_other']) : m(o.id, o.otherLabel || 'Other ' + o.label);
+      if (!opt || (o.off && o.off(STATE[o.id]))) return m(o.id, o.gap || o.label);
+      if (STATE[o.id] === 'Other') return str(STATE[o.id + '_other']) ? (o.otherOut ? o.otherOut(str(STATE[o.id + '_other'])) : cap(STATE[o.id + '_other'])) : m(o.id, o.otherLabel || 'Other ' + o.label);
       return optOut(opt);
     },
     out: function (m) { return o.out === false ? [] : [(o.out || o.label) + ': ' + this.value(m)]; }
@@ -988,7 +1021,7 @@ function textC(o) {
   };
 }
 
-/* a typed reading: digits only. sign 'minus' = always negative (RSRP), 'toggle' = a +/- button (SINR), 'none' (height) */
+/* a typed reading: digits only. sign 'minus' = always negative (RSRP), 'toggle' = a +/- button (repair SINR), 'none' (height, install SINR) */
 function readingC(o) {
   // o: {id, label, out, unit, digits, sign}
   function clean(v) { return String(v === undefined || v === null ? '' : v).replace(/\D/g, '').slice(0, o.digits || 3); }
@@ -1125,19 +1158,42 @@ function nidC() {
   return {
     id: 'nid',
     render: function () {
-      var wrap = choiceField({ id: 'nid', key: 'nid', label: 'NID', options: ['Pre-Installed', 'Installed New'], cols: 2 });
-      if (STATE.nid === 'Pre-Installed') wrap.insertBefore(miniCheck('splice_prior', 'Splice already done in NID'), wrap.querySelector('.field-error-msg'));
-      return wrap;
+      return choiceField({ id: 'nid', key: 'nid', label: 'NID', options: ['Pre-Installed', 'Installed New'], cols: 2 });
     },
     check: function (need) { need('nid', 'NID', !!STATE.nid); },
     out: function (m) {
-      var l = ['NID: ' + (STATE.nid ? cap(STATE.nid) : m('nid', 'Pre-Installed or Installed New'))];
-      if (STATE.nid === 'Pre-Installed') l.push('Splice Status: ' + (STATE.splice_prior === true ? 'Completed in NID prior to install' : 'Completed by tech at install'));
+      return ['NID: ' + (STATE.nid ? cap(STATE.nid) : m('nid', 'Pre-Installed or Installed New'))];
+    }
+  };
+}
+/* connector, then (for a pre-installed NID) the splice tick, then the light level: the reading is taken at the NID once the connector is on */
+function connectorC() {
+  var base = choiceC({ id: 'connector', label: 'Connector Type', options: ['Mechanical', 'Spliced Pigtail'], cols: 2, out: 'Connector', gap: 'Connector type' });
+  return {
+    id: 'connector',
+    render: function () {
+      var wrap = base.render(), err = wrap.querySelector('.field-error-msg');
+      if (STATE.connector && STATE.nid === 'Pre-Installed') wrap.insertBefore(miniCheck('splice_prior', 'Splice already done in NID'), err);
+      wrap.insertBefore(lightBlock(), err);   // always ready to fill in
+      return wrap;
+    },
+    check: function (need, issues) { base.check(need, issues); lightCheck(issues); },
+    out: function (m) {
+      var l = base.out(m);
+      if (STATE.nid === 'Pre-Installed' && STATE.connector) l.push('Splice Status: ' + (STATE.splice_prior === true ? 'Completed in NID prior to install' : 'Completed by tech at install'));
+      l.push('Light Level Reading at NID: ' + lightText(m));
       return l;
     }
   };
 }
-function connectorC() { return choiceC({ id: 'connector', label: 'Connector Type', options: ['Mechanical', 'Spliced Pigtail'], cols: 2, out: 'Connector', gap: 'Connector type' }); }
+/* the light level as a question of its own (fibre repair) */
+function lightC() { return { id: 'light', render: lightBlock, check: function (need, issues) { lightCheck(issues); }, out: function (m) { return ['Light Level Reading: ' + lightText(m)]; } }; }
+function lightCheck(issues) {
+  var lp = parseLight(STATE.light);
+  if (lp === null) issues.push({ id: 'light', label: 'Light Level Reading', msg: 'Type the number only.' });
+  else if (!lightInRange(lp) && STATE.light_ok !== lp) issues.push({ id: 'light', label: 'Light Level Reading (please check it)', msg: 'This reading looks unusual. Check it, or tap the "Yes" button above.' });
+}
+function lightText(m) { var lp = parseLight(STATE.light); return lp === null ? m('light', 'Light level') : '-' + lp + ' dBm' + (lightNeedsCheck() ? ' ' + m('light', 'Check the reading') : ''); }
 /* reused: 'nid' = the reused box only shows for a Pre-Installed NID; 'always' = it always shows (drop required forms have no NID question) */
 function patchC(reused) {
   function showReused() { return reused === 'always' || STATE.nid === 'Pre-Installed'; }
@@ -1160,21 +1216,17 @@ function patchC(reused) {
     }
   };
 }
-/* ONT card with the light level inside it */
-function ontC() {
+/* ONT card; withLight = the light level sits inside it (repairs, which have no connector question) */
+function ontC(withLight) {
   return {
     id: 'ont',
-    render: function () { return locationField('ont', 'ont', 'ONT Installation Location', ROOM_OPTIONS, lightBlock); },
+    render: function () { return locationField('ont', 'ont', 'ONT Installation Location', ROOM_OPTIONS, withLight ? lightBlock : null); },
     check: function (need, issues) {
       need('ont', 'ONT Installation Location', locationDone('ont'), 'Choose the floor and the room.');
-      var lp = parseLight(STATE.light);
-      if (lp === null) issues.push({ id: 'light', label: 'Final Light Level', msg: 'Type the number only.' });
-      else if (!lightInRange(lp) && STATE.light_ok !== lp) issues.push({ id: 'light', label: 'Final Light Level (please check it)', msg: 'This reading looks unusual. Check it, or tap the "Yes" button above.' });
+      if (withLight) lightCheck(issues);
     },
     out: function (m) {
-      var lp = parseLight(STATE.light);
-      var light = lp === null ? m('light', 'Light level') : '-' + lp + ' dBm' + (lightNeedsCheck() ? ' ' + m('light', 'Check the reading') : '');
-      return ['Final Light Level at ONT: ' + light, 'ONT Location: ' + locationText('ont', m)];
+      return (withLight ? ['Light Level Reading at ONT: ' + lightText(m)] : []).concat(['ONT Location: ' + locationText('ont', m)]);
     }
   };
 }
@@ -1185,7 +1237,7 @@ function routerC() {
     check: function (need) { need('router', 'Router Installation Location', locationDone('router'), 'Choose the floor and the room.'); },
     out: function (m) {
       var l = [];
-      if (STATE.own_router === true) l.push('Router Used: Customer chose to use their own router');
+      if (STATE.own_router === true) l.push('Router Used: Customer using their own router');
       l.push('Router Location: ' + locationText('router', m));
       return l;
     }
@@ -1200,28 +1252,38 @@ var DROP_TYPES = [
   ['Hybrid, MPT on Strand', 'Hybrid drop with MPT located on strand']
 ];
 var TEMP_DROP_STEPS = ['Slack left at each end of temporary portion', 'Drop marked with flags and reflective tape', 'Drop routed in way that original line can be easily buried'];
-function tempDropNeeded() { return !!STATE.temp_drop && STATE.temp_drop !== 'Fully Installed'; }
-function dropComps() {
+var PARTIAL_RUN = 'Partial Run, Not to Structure';
+function partialRun() { return STATE.to_structure === PARTIAL_RUN; }
+function statusNeeded() { return !partialRun(); }
+function tempDropNeeded() { return statusNeeded() && STATE.temp_drop === 'Temp Drop Completed'; }
+function spansNeeded() { return /^(Aerial|Hybrid)/.test(STATE.drop_type || ''); }   // buried drops have no spans
+function roadNeeded() { return STATE.drop_type !== 'Buried, MPT in Vault'; }         // nor a road crossing
+/* dropOnly: a drop only job can stop short of the structure (just the road crossing, or part of the run) */
+function dropComps(dropOnly) {
+  var runs = [
+      ['Buried from Flower Pot', 'Buried from flower pot to structure'],
+      ['Buried from Vault', 'Buried directly from vault to structure'],
+      ['Buried from Base of Pole', 'Buried from base of pole to structure'],
+      ['Hung Aerial from Pole', 'Hung aerial from pole to structure']];
+  if (dropOnly) runs.push([PARTIAL_RUN, 'Partial run only (such as the road crossing), not run to structure']);
+  runs.push('Other');
   return [
     choiceC({ id: 'drop_type', label: 'Drop Type', options: DROP_TYPES, cols: 2 }),
     choiceC({ id: 'drop_len', label: 'Drop Length Deployed', options: ['100m', '200m', '300m', '500m', '750m', '1000m'], cols: 3, out: 'Drop Length Deployed' }),
-    choiceC({ id: 'spans', label: 'Spans', options: ['1', '2', '3', '4', '5', 'Other'], cols: 3, otherLabel: 'Number of Spans' }),
-    choiceC({ id: 'road', label: 'Road Crossing', cols: 0, options: [
-      ['Not Required', 'No road crossing required'],
-      ['Required, Speed Limit Under 80 km/h', 'Road crossing required, speed limit under 80 km/h'],
-      ['Required, Flaggers on Site', 'Road crossing required, flaggers on site'],
+    choiceC({ id: 'spans', label: 'Spans', options: ['1', '2', '3', '4', '5', 'Other'], cols: 3, otherLabel: 'Number of Spans', show: spansNeeded }),
+    choiceC({ id: 'road', label: 'Road Crossing', cols: 2, show: roadNeeded, options: [['Not Required', 'Not required'], ['Required', 'Required']] }),
+    choiceC({ id: 'road_how', label: 'Road Crossing Conditions', cols: 2, otherLabel: 'Other Conditions', show: function () { return roadNeeded() && STATE.road === 'Required'; }, options: [
+      ['Under 80 km/h', 'Speed limit under 80 km/h'],
+      ['Flaggers on Site', 'Flaggers on site'],
       'Other'] }),
-    choiceC({ id: 'to_structure', label: 'Drop to Structure', cols: 2, options: [
-      ['From Flower Pot', 'Drop runs to structure from flower pot'],
-      ['From Vault', 'Drop runs to structure from vault'],
-      ['From Base of Pole', 'Drop runs to structure from base of pole'],
-      ['Hung Aerial', 'Drop hung aerial to structure'],
+    choiceC({ id: 'to_structure', label: 'How the Drop Runs to the Structure', out: 'Drop to Structure', otherLabel: 'How the Drop Runs', cols: 2, options: runs }),
+    choiceC({ id: 'temp_drop', label: 'Drop Installation Status', cols: 2, show: statusNeeded, options: [
+      ['Fully Installed', 'Fully installed, no return visit necessary'],
+      ['Temp Drop Completed', 'Temp drop completed']] }),
+    choiceC({ id: 'temp_reason', label: 'Temp Drop Reason', cols: 2, show: tempDropNeeded, otherLabel: 'Other Reason', options: [
+      ['Frozen Ground', 'Frozen ground'],
+      ['Too Long to Hand Trench', 'Buried portion too long to hand trench'],
       'Other'] }),
-    choiceC({ id: 'temp_drop', label: 'Temp Drop', cols: 0, options: [
-      ['Fully Installed', 'Drop fully installed, no return visit necessary'],
-      ['Temp Drop, Frozen Ground', 'Temp drop required due to frozen ground'],
-      ['Temp Drop, Too Long to Hand Trench', 'Temp drop required, buried portion too long to hand trench'],
-      'Other'], otherLabel: 'Other Reason' }),
     checklistC({ id: 'temp_steps', label: 'Temp Drop Checklist', items: TEMP_DROP_STEPS, out: 'Temp Drop Checklist', allOut: 'All steps completed', whatMissing: "A few steps aren't ticked.", show: tempDropNeeded }),
     choiceC({ id: 'temp_form', label: 'Temp Drop Form', cols: 2, options: [['Signed and Emailed', 'Signed by customer and picture emailed to Crystal Kidney'], 'Other'], otherLabel: 'Other Reason', show: tempDropNeeded }),
     textC({ id: 'drop_path', label: 'Drop Path Description', multi: true, show: tempDropNeeded })
@@ -1231,25 +1293,56 @@ function dropComps() {
 /* ---------- fixed wireless and satellite ---------- */
 var CPE_TYPES = ['CAT12 2.5GHz', 'CAT12 3.5GHz', 'First Gen 5G', 'Next Gen 5G', 'First Gen High Gain', 'Next Gen High Gain', 'Pro Max'];
 var GROUND_SOURCES = [['Power Meter', 'Power meter'], ['Electrical Panel', 'Electrical panel'], ['Ground Rod', 'Ground rod'], ['Tower', 'Tower'], ['Copper Pipe', 'Copper pipe'], ['HVAC Disconnect', 'HVAC disconnect'], 'Other'];
-var FW_MOUNTS = [
-  ['New J-Arm', 'New j-arm'], ['New J-Arm + Side Stays', 'New j-arm with side stays'], ['New Gable Mount + 10ft Pole', 'New gable mount + 10ft pole'],
-  ['New Bipod + 5ft Pole', 'New bipod + 5ft pole'], ['New Tripod + 10ft Pole', 'New tripod + 10ft pole'], ['Tower Leg', 'Tower leg (within reach from ladder)'],
-  ['Existing J-Arm', 'Pre-existing j-arm'], ['Existing J-Arm + Side Stays', 'Pre-existing j-arm with side stays'], ['Existing Gable Mount + 10ft Pole', 'Pre-existing gable mount + 10ft pole'],
-  ['Existing Bipod + 5ft Pole', 'Pre-existing bipod + 5ft pole'], ['Existing Tripod + 10ft Pole', 'Pre-existing tripod + 10ft pole'], 'Other'];
+/* fixed wireless install and conversion mounts: the type, then a tick if an existing mount was reused */
+var FW_MOUNTS = [['J-Arm', 'j-arm'], ['J-Arm + Side Stays', 'j-arm with side stays'], ['Gable Mount + 10ft Pole', 'gable mount + 10ft pole'],
+  ['Bipod + 5ft Pole', 'bipod + 5ft pole'], ['Tripod + 10ft Pole', 'tripod + 10ft pole'], ['Tower Leg', 'Tower leg (within reach from ladder)'], 'Other'];
+function fwMountC() { return reuseMountC(FW_MOUNTS); }
+/* the mount type, with a Reused existing mount tick box always under it */
+function reuseMountC(list, noTick) {   // noTick: repairs, where a reused mount goes in the comments instead
+  var base = choiceC({ id: 'mount', label: 'Mount Type', options: list, cols: 2, out: false, otherLabel: 'Other Mount' });
+  function reusable() { return !!STATE.mount && STATE.mount !== 'Tower Leg'; }   // a tower leg is never new or reused
+  return {
+    id: 'mount',
+    render: function () {
+      var wrap = base.render();
+      if (!noTick) wrap.insertBefore(miniCheck('mount_reused', 'Reused existing mount'), wrap.querySelector('.field-error-msg'));
+      return wrap;
+    },
+    check: function (need, issues) { base.check(need, issues); },
+    out: function (m) {
+      var v = base.value(m);
+      if (noTick) return ['Mount: ' + cap(v)];
+      if (reusable() && STATE.mount !== 'Other') v = (STATE.mount_reused === true ? 'Pre-existing ' : 'New ') + v;
+      else if (STATE.mount === 'Other' && str(STATE.mount_other)) v = (STATE.mount_reused === true ? 'Pre-existing ' : 'New ') + lowerFirst(STATE.mount_other);
+      return ['Mount: ' + cap(v)];
+    }
+  };
+}
 var FW_REPAIR_MOUNTS = [['J-Arm', 'J-arm'], ['J-Arm + Side Stays', 'J-arm with side stays'], ['Tripod + 10ft Pole', 'Tripod + 10ft pole'], ['Tower Leg', 'Tower leg (within reach from ladder)'], 'Other'];
-var SAT_MOUNTS = [
-  ['New Tri-Mast on Roof', 'New tri-mast on roof'], ['New Tri-Mast on Wall', 'New tri-mast on wall'], ['New Tri-Mast on New NPRM', 'New tri-mast on new NPRM'],
-  ['Existing Tri-Mast on Roof', 'Pre-existing tri-mast on roof'], ['Existing Tri-Mast on Wall', 'Pre-existing tri-mast on wall'], ['Existing Tri-Mast on Existing NPRM', 'Pre-existing tri-mast on pre-existing NPRM'],
-  ['Existing Pole Mount', 'Pre-existing pole mount'], 'Other'];
-var SAT_REPAIR_MOUNTS = [
-  ['New Tri-Mast on Roof', 'New tri-mast on roof'], ['New Tri-Mast on Wall', 'New tri-mast on wall'], ['Existing Tri-Mast on Roof', 'Pre-existing tri-mast on roof'],
-  ['Existing Tri-Mast on Wall', 'Pre-existing tri-mast on wall'], ['Tri-Mast on New NPRM', 'Tri-mast on new NPRM'], ['Tri-Mast on Existing NPRM', 'Tri-mast on pre-existing NPRM'],
-  ['Existing Pole Mount', 'Pre-existing pole mount'], 'Other'];
+var SAT_MOUNTS = [['Tri-Mast on Roof', 'tri-mast on roof'], ['Tri-Mast on Wall', 'tri-mast on wall'], ['Tri-Mast on NPRM', 'tri-mast on NPRM'], ['Pole Mount', 'pole mount'], 'Other'];
 
 function towerC() { return textC({ id: 'tower', label: 'Tower' }); }
-function rsrpC(final) { return readingC({ id: 'rsrp', label: final ? 'Final RSRP' : 'RSRP', unit: 'dBm', digits: 3, sign: 'minus' }); }
-function sinrC(final) { return readingC({ id: 'sinr', label: final ? 'Final SINR' : 'SINR', unit: 'dB', digits: 2, sign: 'toggle' }); }
-function cpeTypeC() { return choiceC({ id: 'cpe', label: 'CPE Type', options: CPE_TYPES, cols: 2, out: 'CPE' }); }
+function rsrpC(final) { return readingC({ id: 'rsrp', label: 'RSRP', out: final ? 'Final RSRP' : 'RSRP', unit: 'dBm', digits: 3, sign: 'minus' }); }
+function sinrC(final) { return readingC({ id: 'sinr', label: 'SINR', out: final ? 'Final SINR' : 'SINR', unit: 'dB', digits: 2, sign: 'none' }); }   // a successful job always has a positive SINR
+/* withPlat: the Platform question is on the form, so radios that don't belong to it are greyed out */
+function cpeOff(o) { return (STATE.fw_plat === 'FWN' && /^CAT12/.test(o)) || (STATE.fw_plat === 'LTE' && o === 'First Gen 5G'); }
+function cpeRepairOff(o) { return STATE.fw_plat === 'FWN' && /^CAT12/.test(o); }   // a repair can leave a First Gen 5G radio on LTE in place
+function cpeTypeC(withPlat, repair) { return choiceC({ id: 'cpe', label: 'CPE Type', options: CPE_TYPES, cols: 2, out: 'CPE', off: withPlat ? (repair ? cpeRepairOff : cpeOff) : null }); }
+/* how the tech gets to the CPE (fixed wireless and satellite) */
+/* repair: a radio already on a tower may need a climb; installs and conversions never climb */
+function cpeAccessC(repair) { return choiceC({ id: 'cpe_access', label: 'CPE Access', cols: 2, otherLabel: 'Other Access', options:
+  [['Serviceable from Ladder', 'Serviceable from ladder'], ['Stepping onto Roof Required', 'Stepping onto roof required']].concat(repair ? [['Tower Climb', 'Tower climb required']] : []).concat(['Other']) }); }
+function fwPlatC() { return choiceC({ id: 'fw_plat', label: 'Platform', options: ['FWN', 'LTE'], cols: 2, afterChange: function () { if (STATE.cpe && (jobKey() === 'Repair|Fixed Wireless' ? cpeRepairOff : cpeOff)(STATE.cpe)) delete STATE.cpe; } }); }
+/* two short questions side by side */
+function pairC(a, b, tight, c) {
+  var list = [a, b, c].filter(Boolean);
+  return {
+    id: a.id,
+    render: function () { return el('div', { class: 'field-pair' + (tight === true ? ' tight' : tight ? ' ' + tight : '') }, list.map(function (x) { return x.render(); })); },
+    check: function (need, issues) { list.forEach(function (x) { x.check(need, issues); }); },
+    out: function (m) { return [].concat.apply([], list.map(function (x) { return x.out(m); })); }
+  };
+}
 function mountC(list) { return choiceC({ id: 'mount', label: 'Mount Type', options: list, cols: 2, out: 'Mount', otherLabel: 'Other Mount' }); }
 function mountLocC() { return textC({ id: 'mount_loc', label: 'Mount Location' }); }
 function heightC() { return readingC({ id: 'cpe_height', label: 'CPE Height', unit: 'ft', digits: 3, sign: 'none' }); }
@@ -1267,7 +1360,7 @@ function unitsC(key, abbr, label, rooms, max) {
       for (var i = 1; i <= unitCount(key); i++) need(key + i, unitName(key, abbr, i) + ' Installation Location', locationDone(key + i), 'Choose the floor and the room.');
     },
     out: function (m) {
-      if (!STATE[key]) return [abbr + ': ' + m(key, abbr + ' units')];
+      if (!STATE[key]) return [abbr + ': ' + m(key, label)];
       var n = unitCount(key), l = [];
       if (n === 0) l.push(abbr + ': No');
       for (var i = 1; i <= n; i++) l.push(unitName(key, abbr, i) + ' Location: ' + locationText(key + i, m));
@@ -1291,7 +1384,7 @@ function homePhoneC() {
   };
 }
 function vasComps() {
-  return [unitsC('xwh', 'XWH', 'XWH Units Installed', XWH_ROOMS, 3), unitsC('tv', 'TV', 'TV Units Installed', TV_ROOMS, 4), homePhoneC()];
+  return [unitsC('xwh', 'XWH', 'XWH Units Installed', XWH_ROOMS, 3), unitsC('tv', 'XTV', 'XTV Boxes Installed', TV_ROOMS, 4), homePhoneC()];
 }
 
 /* ---------- confirmations ---------- */
@@ -1329,7 +1422,7 @@ var PICS = {
 };
 /* the aerial attachment picture only applies when the drop is hung aerial */
 function dropPhotos() {
-  return PICS.fibreDrop.filter(function (p) { return p !== 'Drop attachment point (aerial)' || STATE.to_structure === 'Hung Aerial' || /^(Aerial|Hybrid), MPT on Strand$/.test(STATE.drop_type || ''); });
+  return PICS.fibreDrop.filter(function (p) { return p !== 'Drop attachment point (aerial)' || STATE.to_structure === 'Hung Aerial from Pole' || /^(Aerial|Hybrid), MPT on Strand$/.test(STATE.drop_type || ''); });
 }
 function dropPhotosC() {
   return {
@@ -1348,122 +1441,152 @@ function repairComps() {
   ];
 }
 
+/* fixed wireless conversion and repair: cabling, surge and grounding may be reused or replaced */
+function fwSwapCabling() {
+  return [
+    choiceC({ id: 'cabling', label: 'Cabling', cols: 2, otherLabel: 'Cabling Details', options: [
+      ['Reused - Meets Xplore Standards', 'Reused existing cabling which meets Xplore standards'],
+      ['Replaced - Original Cable Not Up to Xplore Standards', 'Replaced cabling, original cable was not up to Xplore standards'],
+      ['Replaced - New Mount Location Required', 'Replaced cabling, new mount location required'],
+      'Other'] }),
+    choiceC({ id: 'surge', label: 'Surge Suppressor', cols: 2, out: 'Surge', otherLabel: 'Surge Details', options: [
+      ['Installed New - Replaced Original', 'Installed new surge suppressor, replacing original'],
+      ['Installed New - No Pre-Existing Surge', 'Installed new surge suppressor, no pre-existing surge suppressor'],
+      'Other'] }),
+    choiceC({ id: 'grounding', label: 'Grounding', cols: 2, otherLabel: 'Grounding Details', options: [
+      ['Reused - Meets Xplore Standards', 'Reused existing ground solution which meets Xplore standards'],
+      ['Installed New - None Before', 'Installed new grounding, no pre-existing grounding solution'],
+      ['Installed New - Old Not Up to Standards', 'Installed new grounding, existing grounding solution not up to Xplore standards'],
+      'Other'] }),
+    groundSourceC()
+  ];
+}
+
+/* value added services repair: tick each piece of equipment serviced, then its floor and room */
+var VAS_GEAR = [['XWR', ROOM_OPTIONS], ['XWH', XWH_ROOMS], ['XTV', TV_ROOMS]];
+function gearOn(g) { return STATE.vas_gear && STATE.vas_gear[g] === true; }
+function vasRepairComps() {
+  var pick = {
+    id: 'vas_gear',
+    render: function () {
+      var g = el('div', { class: 'choices cols-3', role: 'group', 'data-multi': '1' });
+      VAS_GEAR.forEach(function (v) {
+        var k = v[0], on = gearOn(k);
+        g.appendChild(el('button', { type: 'button', class: 'choice', role: 'checkbox', 'aria-checked': on ? 'true' : 'false',
+          onclick: function () { var t = Object.assign({}, STATE.vas_gear || {}); t[k] = !on; STATE.vas_gear = t; changed('vas_gear', true); } },
+          [el('span', { class: 'mark', text: on ? '✓' : '' }), el('span', { text: k })]));
+      });
+      return fieldWrap('vas_gear', 'Equipment', false, 'Tick each one you serviced.', [g]);
+    },
+    check: function (need) { need('vas_gear', 'Equipment', VAS_GEAR.some(function (v) { return gearOn(v[0]); }), 'Tick at least one.'); },
+    out: function (m) {
+      var on = VAS_GEAR.filter(function (v) { return gearOn(v[0]); }).map(function (v) { return v[0]; });
+      return ['Equipment Serviced: ' + (on.length ? on.join(', ') : m('vas_gear', 'XWR, XWH or XTV'))];
+    }
+  };
+  return [pick].concat(VAS_GEAR.map(function (v) {
+    var k = v[0];
+    return locationC({ id: k.toLowerCase() + '_loc', label: k + ' Location', rooms: v[1], show: function () { return gearOn(k); } });
+  }));
+}
+
 /* ---------- the jobs ---------- */
 function S(title, items, heading) { return { title: title, heading: heading === undefined ? title.toUpperCase() : heading, items: items }; }
 function vasSection() { return S('Value Added Services', vasComps()); }
 function commentsSection() { return { title: 'Additional Comments', heading: 'ADDITIONAL COMMENTS', optional: true, items: [commentsC()] }; }
 
-var JOB_TYPES = ['New Install', 'Conversion', 'Repair'];
-var SERVICES = {
-  'New Install': ['Fibre (Existing Drop)', 'Fibre (Drop Required)', 'Fixed Wireless', 'Satellite', 'VAS'],
-  'Conversion': ['Fibre (Existing Drop)', 'Fibre (Drop Required)', 'Fixed Wireless', 'Satellite'],
-  'Repair': ['Fibre', 'Fixed Wireless', 'Satellite', 'VAS']
-};
 
 var FORMS = {
   'New Install|Fibre (Existing Drop)': function () {
-    return [S('Outdoor', [nidC(), connectorC(), patchC('nid')]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
-      S('Confirmations', [xapC(FIBRE_XAP), photosC(PICS.fibreExisting), lawnC()])];
+    return [S('Outdoor', [nidC(), connectorC()]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
+      S('Confirmations', [xapC(FIBRE_XAP), lawnC()])];
   },
   'Conversion|Fibre (Existing Drop)': function () {
-    return [S('Outdoor', [nidC(), connectorC(), patchC('nid')]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
-      S('Confirmations', [photosC(PICS.fibreExisting), lawnC()])];
+    return [S('Outdoor', [nidC(), connectorC()]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
+      S('Confirmations', [lawnC()])];
   },
   'New Install|Fibre (Drop Required)': function () {
-    return [S('Drop', dropComps()), S('Outdoor', [connectorC(), patchC('always')]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
-      S('Confirmations', [xapC(FIBRE_XAP), dropPhotosC(), lawnC()])];
+    return [S('Drop', dropComps()), S('Outdoor', [connectorC()]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
+      S('Confirmations', [xapC(FIBRE_XAP), lawnC()])];
   },
   'Conversion|Fibre (Drop Required)': function () {
-    return [S('Drop', dropComps()), S('Outdoor', [connectorC(), patchC('always')]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
-      S('Confirmations', [dropPhotosC(), lawnC()])];
+    return [S('Drop', dropComps()), S('Outdoor', [connectorC()]), S('Indoor', [ontC(), routerC()]), vasSection(), commentsSection(),
+      S('Confirmations', [lawnC()])];
   },
+  'New Install|Fibre (Drop Only)': function () { return [S('Drop', dropComps(true))]; },
   'New Install|Fixed Wireless': function () {
     return [
-      S('Signal', [towerC(), rsrpC(), sinrC(), cpeTypeC()]),
-      S('Mount', [mountC(FW_MOUNTS),
-        choiceC({ id: 'mount_into', label: 'Mount Installed Into', options: [['Asphalt Shingle Roof', 'Asphalt shingle roof'], ['Fascia', 'Fascia'], ['Wall', 'Wall'], ['Tower', 'Tower'], 'Other'], cols: 2, out: 'Mounted Into', otherLabel: 'Other Surface' }),
-        mountLocC(), heightC()]),
+      S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(), sinrC(), 'tight mini'), null), cpeTypeC(true)]),
+      S('Mount', [fwMountC(),
+        choiceC({ id: 'mount_into', label: 'Mounting Surface', options: [['Asphalt Shingle Roof', 'Asphalt shingle roof'], ['Fascia', 'Fascia'], ['Wall', 'Wall'], ['Tower', 'Tower'], 'Other'], cols: 2, out: 'Mounting Surface', otherLabel: 'Other Surface' }),
+        pairC(mountLocC(), heightC()), cpeAccessC()]),
       S('Cabling and Grounding', [
-        choiceC({ id: 'cabling', label: 'Cabling', options: [['All New Xplore Standard', 'Installed all new Xplore standard cabling'], 'Other'], cols: 2, otherLabel: 'Cabling Details' }),
-        choiceC({ id: 'surge', label: 'Surge Suppressor', options: [['Installed New', 'Installed new surge suppressor'], 'Other'], cols: 2, out: 'Surge', otherLabel: 'Surge Details' }),
+        choiceC({ id: 'cabling', label: 'Cabling', options: [['New Xplore Standard Cabling', 'Installed new Xplore standard cabling'], 'Other'], cols: 2,
+          otherLabel: 'Why Were Xplore Standards Not Met', otherOut: function (r) { return 'Xplore standards not met, ' + r; } }),
+        choiceC({ id: 'surge', label: 'Surge Suppressor', options: [['Installed New', 'Installed new surge suppressor'], 'Other'], cols: 2, out: 'Surge',
+          otherLabel: 'Why Was a New One Not Installed', otherOut: function (r) { return 'New surge suppressor not installed, ' + r; } }),
         groundSourceC()]),
       S('Indoor', [powerC(), routerC()]), vasSection(), commentsSection(),
-      S('Confirmations', [xapC(FW_XAP), photosC(PICS.fw), lawnC(LAWN_REASONS_FW)])];
+      S('Confirmations', [xapC(FW_XAP), lawnC(LAWN_REASONS_FW)])];
   },
   'Conversion|Fixed Wireless': function () {
     return [
       S('Conversion', [choiceC({ id: 'conv_type', label: 'Conversion Type', cols: 2, out: 'Conversion', options: [
         ['LTE to FWN, Same Tower', 'LTE to FWN to same tower'], ['LTE to FWN, New Tower', 'LTE to FWN to new tower'], ['SAT to FWN', 'SAT to FWN'], ['SAT to LTE', 'SAT to LTE'], ['Move Conversion', 'Move conversion']] })]),
-      S('Signal', [towerC(), rsrpC(), sinrC(), cpeTypeC()]),
-      S('Mount', [mountC(FW_MOUNTS), mountLocC(), heightC()]),
-      S('Cabling and Grounding', [
-        choiceC({ id: 'cabling', label: 'Cabling', cols: 0, otherLabel: 'Cabling Details', options: [
-          ['Reused, Meets Xplore Standards', 'Reused existing cabling which meets Xplore standards'],
-          ['Replaced, Not Up to Xplore Standards', 'Replaced cabling, existing cable was not up to Xplore standards'],
-          ['Replaced, New Mount Location Required', 'Replaced cabling, new mount location required'],
-          'Other'] }),
-        choiceC({ id: 'surge', label: 'Surge Suppressor', cols: 0, out: 'Surge', otherLabel: 'Surge Details', options: [
-          ['Installed New, Replaced Old One', 'Installed new surge suppressor, replacing old one'],
-          ['Installed New, None Before', 'Installed new surge suppressor, no pre-existing surge suppressor'],
-          'Other'] }),
-        choiceC({ id: 'grounding', label: 'Grounding', cols: 0, otherLabel: 'Grounding Details', options: [
-          ['Reused, Meets Xplore Standards', 'Reused existing ground solution which meets Xplore standards'],
-          ['Installed New, None Before', 'Installed new grounding, no pre-existing grounding solution'],
-          ['Installed New, Old Not Up to Standards', 'Installed new grounding, existing grounding solution not up to Xplore standards'],
-          'Other'] }),
-        groundSourceC()]),
+      S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(), sinrC(), 'tight mini'), null), cpeTypeC(true)]),
+      S('Mount', [fwMountC(), pairC(mountLocC(), heightC()), cpeAccessC()]),
+      S('Cabling and Grounding', fwSwapCabling()),
       S('Indoor', [powerC(), routerC()]),
       S('Old Equipment', [choiceC({ id: 'recovery', label: 'Original CPE', cols: 0, out: 'Recovery', otherLabel: 'Recovery Details', options: [
         ['Recovered for RMA', 'Recovered original CPE for RMA'], ['Recovered to Be Recycled', 'Recovered original CPE to be recycled'], ['Not Recovered, No RMA', 'Did not recover original CPE, no RMA'], 'Other'] })]),
       vasSection(), commentsSection(),
-      S('Confirmations', [photosC(PICS.fw), lawnC()])];
+      S('Confirmations', [lawnC()])];
   },
   'New Install|Satellite': function () { return satForm(true); },
   'Conversion|Satellite': function () { return satForm(false); },
   'New Install|VAS': function () {
-    return [vasSection(), commentsSection(), S('Confirmations', [photosC(PICS.vas), lawnC()])];
+    return [vasSection(), commentsSection(), S('Confirmations', [lawnC()])];
   },
   'Repair|Fibre': function () {
-    return [S('Repair', repairComps()), S('Indoor', [ontC(), routerC()]), commentsSection(), S('Confirmations', [photosC(PICS.repairFibre), lawnC()])];
+    return [S('Repair', repairComps().concat([lightC()])), S('Indoor', [ontC(), routerC()]), commentsSection(), S('Confirmations', [lawnC()])];
   },
   'Repair|Fixed Wireless': function () {
     return [
       S('Repair', repairComps()),
-      S('Signal', [towerC(), textC({ id: 'cell_id', label: 'Cell ID' }), rsrpC(true), sinrC(true), cpeTypeC()]),
-      S('Mount', [mountC(FW_REPAIR_MOUNTS), mountLocC(), heightC()]),
-      S('Cabling and Grounding', [
-        choiceC({ id: 'cabling', label: 'Cabling', cols: 2, otherLabel: 'Why Not', options: [['Up to Xplore Specs', 'Confirmed all cabling is up to Xplore specifications'], ['Not Up to Specs', 'Not up to Xplore specifications']] }),
-        cablingWhyC(),
-        groundSourceC()]),
+      S('Signal', [pairC(towerC(), fwPlatC()), pairC(pairC(rsrpC(true), sinrC(true), 'tight mini'), textC({ id: 'cell_id', label: 'Cell ID' })), cpeTypeC(true, true)]),
+      S('Mount', [reuseMountC(FW_MOUNTS, true), pairC(mountLocC(), heightC()), cpeAccessC(true)]),
+      S('Cabling and Grounding', fwSwapCabling()),
       S('Indoor', [powerC(), routerC()]), commentsSection(),
-      S('Confirmations', [photosC(PICS.repairFw), lawnC()])];
+      S('Confirmations', [lawnC()])];
   },
   'Repair|Satellite': function () {
     return [
       S('Repair', repairComps()),
       S('Dish', [
         choiceC({ id: 'los', label: 'Line of Sight', cols: 2, out: 'LOS', otherLabel: 'LOS Details', options: [['Confirmed Clear', 'Confirmed LOS is clear of obstructions'], 'Other'] }),
-        choiceC({ id: 'peak', label: 'Point and Peak', cols: 0, out: 'Point & Peak', otherLabel: 'Point and Peak Details', options: [
+        choiceC({ id: 'peak', label: 'Point and Peak', cols: 2, out: 'Point & Peak', otherLabel: 'Point and Peak Details', options: [
           ['Pointed and Peaked', 'Pointed & peaked system while on site'], ['Not Necessary', 'Did not repoint and peak system, not necessary'], 'Other'] })]),
-      S('Mount', [mountC(SAT_REPAIR_MOUNTS), mountLocC()]),
+      S('Mount', [reuseMountC(SAT_MOUNTS, true), mountLocC(), cpeAccessC(true)]),
       S('Cabling and Grounding', [
         choiceC({ id: 'cabling', label: 'Cabling', cols: 2, otherLabel: 'Cabling Details', options: [['Up to Xplore Specs', 'Confirmed all cabling is up to Xplore specifications'], 'Other'] }),
         groundSourceC()]),
       S('Indoor', [modemC(), routerC()]), commentsSection(),
-      S('Confirmations', [photosC(PICS.repairSat), lawnC()])];
+      S('Confirmations', [lawnC()])];
   },
   'Repair|VAS': function () {
-    return [S('Repair', repairComps()), commentsSection(), S('Confirmations', [photosC(PICS.repairVas), lawnC()])];
+    return [S('Repair', repairComps()), S('Equipment Serviced', vasRepairComps()), commentsSection(), S('Confirmations', [lawnC()])];
   }
 };
 function satForm(install) {
-  var conf = [photosC(PICS.sat), lawnC()];
+  var conf = [lawnC()];
   if (install) conf.unshift(xapC(SAT_XAP));
   return [
-    S('Mount', [mountC(SAT_MOUNTS), mountLocC()]),
+    S('Mount', [reuseMountC(SAT_MOUNTS), mountLocC(), cpeAccessC()]),
     S('Cabling and Grounding', [
-      choiceC({ id: 'cabling', label: 'Cabling', options: [['All New Xplore Standard', 'All new Xplore standard cabling installed'], 'Other'], cols: 2, otherLabel: 'Cabling Details' }),
-      choiceC({ id: 'ground_block', label: 'Ground Block', options: [['Installed New', 'New ground block installed'], 'Other'], cols: 2, otherLabel: 'Ground Block Details' }),
+      choiceC({ id: 'cabling', label: 'Cabling', options: [['New Xplore Standard Cabling', 'Installed new Xplore standard cabling'], 'Other'], cols: 2,
+        otherLabel: 'Why Were Xplore Standards Not Met', otherOut: function (r) { return 'Xplore standards not met, ' + r; } }),
+      choiceC({ id: 'ground_block', label: 'Ground Block', options: [['Installed New', 'Installed new ground block'], 'Other'], cols: 2,
+        otherLabel: 'Why Was a New One Not Installed', otherOut: function (r) { return 'New ground block not installed, ' + r; } }),
       groundSourceC()]),
     S('Indoor', [modemC(), routerC()]), vasSection(), commentsSection(),
     S('Confirmations', conf)];
@@ -1475,49 +1598,100 @@ function cablingWhyC() {
   return c;
 }
 
-/* the job picked at the top */
-function jobKey() { return STATE.job_type && STATE.job_svc && SERVICES[STATE.job_type] && SERVICES[STATE.job_type].indexOf(STATE.job_svc) >= 0 ? STATE.job_type + '|' + STATE.job_svc : null; }
-function jobTitle() { var k = jobKey(); return k ? STATE.job_type + ' — ' + STATE.job_svc : ''; }
+/* the job picked at the top: Job Type, Platform and Outcome, then the drop for a Fibre install or conversion */
+var PICK_TYPES = ['Install', 'Conversion', 'Repair'];
+var PICK_PLATS = ['Fibre', 'Fixed Wireless', 'Satellite', 'Value Added Services'];
+var PICK_OUTCOMES = ['Complete', 'Cannot Complete', 'Not Required'];
+var PICK_DROPS = ['Existing Drop', 'Drop Required', 'Drop Only'];
+var SOON = { 'Cannot Complete': true, 'Not Required': true };   // forms still to come: shown greyed out
+function needsDrop(st) { st = st || STATE; return st.job_plat === 'Fibre' && (st.job_type === 'Install' || st.job_type === 'Conversion'); }
+function dropOff(o, st) { st = st || STATE; return o === 'Drop Only' && st.job_type !== 'Install'; }   // drop only is an install job
+function platOff(o, st) { st = st || STATE; return o === 'Value Added Services' && st.job_type === 'Conversion'; }   // no VAS conversion form
+function jobKey() {
+  var t = STATE.job_type, p = STATE.job_plat;
+  if (PICK_TYPES.indexOf(t) < 0 || PICK_PLATS.indexOf(p) < 0 || STATE.job_outcome !== 'Complete' || platOff(p)) return null;
+  var svc = p === 'Value Added Services' ? 'VAS' : p;
+  if (needsDrop()) { if (PICK_DROPS.indexOf(STATE.job_drop) < 0 || dropOff(STATE.job_drop)) return null; svc = 'Fibre (' + STATE.job_drop + ')'; }
+  var k = (t === 'Install' ? 'New Install' : t) + '|' + svc;
+  return FORMS[k] ? k : null;
+}
+function platLabel(st) { st = st || STATE; return st.job_plat === 'Fibre' && needsDrop(st) && st.job_drop ? 'Fibre (' + st.job_drop + ')' : st.job_plat; }
+function jobTitle() { return jobKey() ? STATE.job_type + ' — ' + platLabel() : ''; }
 function currentSections() { var k = jobKey(); return k ? FORMS[k]() : []; }
 function visible(c) { return !c.show || c.show(); }
+/* jobs saved by older versions used one Job Type and a Service */
+function migrateJob(st) {
+  if (!st || !st.job_svc) return st;
+  var s = st.job_svc, f = /^Fibre \((.+)\)$/.exec(s);
+  st.job_type = st.job_type === 'New Install' ? 'Install' : st.job_type;
+  st.job_plat = f ? 'Fibre' : s === 'VAS' ? 'Value Added Services' : s;
+  if (f) st.job_drop = f[1];
+  st.job_outcome = 'Complete';
+  delete st.job_svc;
+  return st;
+}
 
-var JOB_KEYS = ['job_type', 'job_svc'];
+var JOB_KEYS = ['job_type', 'job_plat', 'job_outcome', 'job_drop', 'job_svc'];
 function answersBesidesJob(st) { var c = {}; Object.keys(st || {}).forEach(function (k) { if (JOB_KEYS.indexOf(k) < 0) c[k] = st[k]; }); return hasAnswers(c); }
 /* changing the job clears the answers (Undo brings them back), so a value from another form can never slip into this one */
 function setJob(key, value) {
-  if (STATE[key] === value) return;
-  var before = JSON.stringify(STATE), had = answersBesidesJob(STATE);
-  var t = key === 'job_type' ? value : STATE.job_type, s = key === 'job_svc' ? value : STATE.job_svc;
-  if (key === 'job_type' && s && SERVICES[t].indexOf(s) < 0) s = undefined;   // that service isn't offered for this job type
-  var wasKey = jobKey();
-  STATE.job_type = t; STATE.job_svc = s;
+  if (STATE[key] === value || SOON[value]) return;
+  var before = JSON.stringify(STATE), had = answersBesidesJob(STATE), wasKey = jobKey();
+  STATE[key] = value;
+  if (platOff(STATE.job_plat)) delete STATE.job_plat;   // Conversion picked with Value Added Services: pick the platform again
+  if (!needsDrop() || dropOff(STATE.job_drop)) delete STATE.job_drop;
+  var job = {}; JOB_KEYS.forEach(function (k) { if (STATE[k] !== undefined) job[k] = STATE[k]; });
   if (had && wasKey && jobKey() !== wasKey) {
-    var keep = { job_type: t, job_svc: s };
-    STATE = keep; ERRORS = []; PROMPT = {}; LIGHT_PROMPT = false; PEAK = 0;
+    STATE = job; ERRORS = []; PROMPT = {}; LIGHT_PROMPT = false; PEAK = 0;
     showToast('Answers cleared for the new job.', 'Undo', function () { STATE = JSON.parse(before); ERRORS = []; PEAK = 0; render(); updatePreview(); wipSaveNow(); }, 10000);
   } else if (jobKey() !== wasKey) PEAK = 0;
   ERRORS = ERRORS.filter(function (e) { return e.id !== 'job'; });
   changed('job', true);
 }
+function jobMissing() {
+  var a = [];
+  if (!STATE.job_type) a.push('job type');
+  if (!STATE.job_plat) a.push('platform');
+  if (!STATE.job_outcome) a.push('outcome');
+  if (STATE.job_type && STATE.job_plat && needsDrop() && !STATE.job_drop) a.push('drop');
+  return a;
+}
 function jobSection() {
   var e = errFor('job');
   var wrap = el('div', { class: 'field job-field' + (e ? ' has-error' : ''), 'data-field-id': 'job' });
-  function group(key, opts, cols) {
+  function group(key, opts, cols, off) {
     var g = el('div', { class: 'choices cols-' + cols, role: 'radiogroup' });
     opts.forEach(function (o) {
-      var on = STATE[key] === o;
-      g.appendChild(el('button', { type: 'button', class: 'choice', role: 'radio', 'aria-checked': on ? 'true' : 'false', onclick: function () { setJob(key, o); } },
-        [el('span', { class: 'mark', text: on ? '✓' : '' }), el('span', { text: o })]));
+      var on = STATE[key] === o, dis = SOON[o] || (off && off(o));
+      var b = el('button', { type: 'button', class: 'choice', role: 'radio', 'aria-checked': on ? 'true' : 'false', onclick: function () { setJob(key, o); } },
+        [el('span', { class: 'mark', text: on ? '✓' : '' }), el('span', { text: o })]);
+      if (dis) { b.disabled = true; b.setAttribute('aria-disabled', 'true'); }
+      g.appendChild(b);
     });
     return g;
   }
-  wrap.appendChild(el('span', { class: 'q', text: 'Job Type' }));
-  wrap.appendChild(group('job_type', JOB_TYPES, 3));
-  if (STATE.job_type) {
-    wrap.appendChild(el('div', { 'data-anim': 'job_svc_' + STATE.job_type }, [el('p', { class: 'sub-q', text: 'Service' }), group('job_svc', SERVICES[STATE.job_type], 2)]));
-  }
+  wrap.appendChild(el('p', { class: 'sub-q first', text: 'Job Type' }));
+  wrap.appendChild(group('job_type', PICK_TYPES, 3));
+  wrap.appendChild(el('p', { class: 'sub-q', text: 'Platform' }));
+  wrap.appendChild(group('job_plat', PICK_PLATS, 2, platOff));
+  wrap.appendChild(el('p', { class: 'sub-q', text: 'Outcome' }));
+  wrap.appendChild(group('job_outcome', PICK_OUTCOMES, 3));
+  if (needsDrop() && STATE.job_outcome === 'Complete')
+    wrap.appendChild(el('div', { 'data-anim': 'job_drop' }, [el('p', { class: 'sub-q', text: 'Drop' }), group('job_drop', PICK_DROPS, 3, dropOff)]));
   if (e) wrap.appendChild(el('div', { class: 'field-error-msg', text: e.msg }));
   return el('section', { class: 'form-section job-section', 'data-sec': 'Job' }, [el('h2', { class: 'form-section-title', text: 'Job' }), wrap]);
+}
+/* until the job is picked, grey placeholder sections show where the questions will load */
+function ghostSections() {
+  function bars(n) { var a = []; for (var i = 0; i < n; i++) a.push(el('span', { class: 'ghost-bar' + (i % 3 === 2 ? ' short' : '') })); return a; }
+  function pills(n) { var a = []; for (var i = 0; i < n; i++) a.push(el('span', { class: 'ghost-pill' })); return a; }
+  function sec(title, body) { return el('div', { class: 'ghost-sec' }, [el('div', { class: 'ghost-title', text: title })].concat(body)); }
+  return el('div', { class: 'ghost-form', 'aria-hidden': 'true', 'data-sec': 'Ghost' }, [
+    el('p', { class: 'ghost-note', text: 'Pick the job to begin. Your questions will load here.' }),
+    sec('Outdoor', [el('div', { class: 'ghost-pills' }, pills(3)), el('div', { class: 'ghost-bars' }, bars(2))]),
+    sec('Indoor', [el('div', { class: 'ghost-bars' }, bars(3))]),
+    sec('Confirmations', [el('div', { class: 'ghost-pills' }, pills(2)), el('div', { class: 'ghost-bars' }, bars(2))])
+  ]);
 }
 
 /* ===================== the form ===================== */
@@ -1579,6 +1753,7 @@ function render() {
   var before = mount.children.length ? formSnapshot(mount) : null;
   mount.innerHTML = '';
   mount.appendChild(jobSection());
+  if (!jobKey()) mount.appendChild(ghostSections());
   currentSections().forEach(function (sec) {
     var items = sec.items.filter(visible);
     if (!items.length) return;
@@ -1603,7 +1778,7 @@ function validate() {
   var name = getName();
   if (!name.first || !name.last) issues.push({ id: 'tech', label: 'Your first and last name', msg: 'Please enter your first and last name.' });
   function need(id, label, cond, msg) { if (!cond) issues.push({ id: id, label: label, msg: msg || 'Please choose an answer.' }); }
-  if (!jobKey()) { need('job', 'Job', false, STATE.job_type ? 'Choose the service.' : 'Choose the job type and the service.'); return issues; }
+  if (!jobKey()) { need('job', 'Job', false, 'Choose the ' + jobMissing().join(', ').replace(/, ([^,]*)$/, ' and $1') + '.'); return issues; }
   currentSections().forEach(function (sec) { sec.items.filter(visible).forEach(function (c) { c.check(need, issues); }); });
   if (jobKey() === 'New Install|VAS' && STATE.xwh === 'None' && STATE.tv === 'None' && STATE.hphone === 'No')
     issues.push({ id: 'xwh', label: 'Value Added Services', msg: 'A VAS install needs at least one service installed.' });
@@ -1629,7 +1804,7 @@ function buildOutput(mark) {
   var m = M(mark);
   var name = getName();
   var who = name.first && name.last ? name.first + ' ' + name.last : m('tech', 'Your name');
-  var title = jobKey() ? jobTitle() : (STATE.job_type ? STATE.job_type + ' — ' + m('job', 'Service') : m('job', 'Job type'));
+  var title = jobKey() ? jobTitle() : (STATE.job_type || m('job', 'Job Type')) + ' — ' + (STATE.job_plat && !(needsDrop() && !STATE.job_drop) ? platLabel() : m('job', STATE.job_plat ? 'Drop' : 'Platform'));
   var lines = [who + ' - ' + title + ' - ' + stamp()];
   if (!jobKey()) return lines.join('\n');
   currentSections().forEach(function (sec) {
@@ -1734,6 +1909,7 @@ function onCopy() {
   function ok() {
     wipClear();
     COPIED = true; COPY_FLASH = true; updatePreview();
+    showPreviewIfAbove();
     clearTimeout(FLASH_TIMER); FLASH_TIMER = setTimeout(function () { COPY_FLASH = false; updatePreview(); }, 2200);
   }
   function fallback() {
@@ -1788,6 +1964,14 @@ function showToast(msg, actionLabel, onAction, ms) {
 }
 function hideToast() { var t = $('toast'); if (!t || t.hidden) return; clearTimeout(showToast.t); t.classList.add('out'); setTimeout(function () { t.hidden = true; t.classList.remove('out'); }, 200); }
 
+/* after a copy from further up the page, glide down so the finished comment is on screen */
+function showPreviewIfAbove() {
+  var p = $('preview'); if (!p) return;
+  var r = p.getBoundingClientRect(), bar = $('sticky-bar'), barH = bar ? bar.offsetHeight : 0;
+  if (r.top < window.innerHeight - barH - 80) return;   // already in view (or scrolled past it)
+  window.scrollTo({ top: window.pageYOffset + r.top - 12, behavior: calm() ? 'auto' : 'smooth' });
+}
+
 /* ===================== safety net: the job in progress is saved on this phone, so a refresh or a closed tab loses nothing.
    It is cleared once the comment is copied or a new job is started, and ignored after 12 hours. ===================== */
 var WIP_MAX = 12 * 3600000, WIP_OFFER = false, WIP_T = null;
@@ -1797,7 +1981,7 @@ function wipClear() { clearTimeout(WIP_T); WIP_T = null; store.del(WIP_KEY); }
 function wipOffer() {
   // a job saved by an older version moves over once
   // a job saved by an older version (always the Fibre existing drop install) moves over once
-  var FIBRE_EXISTING = { job_type: 'New Install', job_svc: 'Fibre (Existing Drop)' };
+  var FIBRE_EXISTING = { job_type: 'Install', job_plat: 'Fibre', job_drop: 'Existing Drop', job_outcome: 'Complete' };
   var old = store.get(OLD_DRAFT_KEY);
   if (old) {
     try { var o = JSON.parse(old); if (hasAnswers(o) && !store.get(WIP_KEY)) store.set(WIP_KEY, JSON.stringify({ at: Date.now(), state: Object.assign(o, FIBRE_EXISTING) })); } catch (e) {}
@@ -1809,13 +1993,13 @@ function wipOffer() {
     store.del(OLD_WIP_KEY);
   }
   var d = null;
-  try { d = JSON.parse(store.get(WIP_KEY) || 'null'); } catch (e) { d = null; }
+  try { d = JSON.parse(store.get(WIP_KEY) || 'null'); if (d) migrateJob(d.state); } catch (e) { d = null; }
   if (!d || !hasAnswers(d.state) || !d.at || Date.now() - d.at > WIP_MAX) { wipClear(); return; }
   if (hasAnswers(STATE)) return;   // they have already started a new one
   WIP_OFFER = true;
   var mins = Math.max(1, Math.round((Date.now() - d.at) / 60000));
   var ago = mins < 60 ? mins + ' min ago' : Math.round(mins / 60) + ' hr ago';
-  showToast('You have an unfinished ' + (d.state.job_type && d.state.job_svc ? d.state.job_type + ' \u2014 ' + d.state.job_svc + ' ' : '') + 'job from ' + ago + '.', 'Restore', function () {
+  showToast('You have an unfinished ' + (d.state.job_type && d.state.job_plat ? d.state.job_type + ' \u2014 ' + platLabel(d.state) + ' ' : '') + 'job from ' + ago + '.', 'Restore', function () {
     WIP_OFFER = false; STATE = d.state; ERRORS = []; COPIED = false; PEAK = 0; render(); updatePreview(); wipSaveNow();
   });
   showToast.onDismiss = function () { WIP_OFFER = false; wipClear(); };
@@ -1889,7 +2073,8 @@ function fadeTheme() {   // let the colours glide for a moment
   var root = document.documentElement; root.classList.add('theme-fade'); clearTimeout(FADE_TIMER);
   FADE_TIMER = setTimeout(function () { root.classList.remove('theme-fade'); }, 520);
 }
-function themeMode() { var t = store.get(THEME_KEY); return t === 'light' || t === 'dark' ? t : 'auto'; }
+var SETTINGS_ON = false;   // Settings are off for now: the app is always in light mode (white background)
+function themeMode() { if (!SETTINGS_ON) return 'light'; var t = store.get(THEME_KEY); return t === 'light' || t === 'dark' ? t : 'auto'; }
 function systemTheme() { return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; }
 function oledOn() { return document.documentElement.getAttribute('data-oled') === 'on'; }
 function applyTheme(remember) {
@@ -1939,6 +2124,68 @@ function initSettings() {
 
 /* ===================== change log (opened from the version number in the footer; newest first) ===================== */
 var CHANGELOG = [
+  { v: '2.10.1', d: 'Nov 6, 2026', items: ['Fixed Wireless repair and conversion: Cabling, Surge Suppressor and Grounding use regular buttons with clearer wording.', 'Fixed Wireless: RSRP and SINR boxes stretch to fill half the row on every form.'] },
+  { v: '2.10.0', d: 'Nov 6, 2026', items: ['Value Added Services repair: tick XWR, XWH and/or XTV, then give the floor and room for each.', 'Satellite repair: Point and Peak uses the same buttons as everything else.', 'CPE Access: Tower Climb only shows on repairs.', 'Fixed Wireless repair: Final RSRP and Final SINR sit on the same row as Cell ID.'] },
+  { v: '2.9.9', d: 'Nov 6, 2026', items: [
+    'Fixed Wireless and Satellite: new CPE Access question (Serviceable from Ladder, Stepping onto Roof Required, Tower Climb or Other).',
+    'Repairs: no Reused existing mount tick box. Mention it in the comments instead.',
+    'Fixed Wireless repair: First Gen 5G stays available on LTE, and Cell ID sits under Platform.'
+  ] },
+  { v: '2.9.8', d: 'Nov 6, 2026', items: [
+    'Fibre repair: Light Level Reading moved up to the Repair section.',
+    'The own router tick box now reads Customer using their own router.',
+    'Fixed Wireless repair now matches installs and conversions: Platform beside Tower (greying out radios that don\'t belong), SINR with no +/- button, the same Mount Type list with the Reused existing mount tick box, and the conversion Cabling, Surge Suppressor and Grounding questions.'
+  ] },
+  { v: '2.9.7', d: 'Nov 6, 2026', items: ['Light mode background now matches the Work Order Description Generator (soft mint).', 'The preview is now titled FSL Comment.'] },
+  { v: '2.9.6', d: 'Nov 6, 2026', items: ['Fixed Wireless conversion: Platform (FWN or LTE) beside Tower, greying out the radios that don\'t belong, same as installs.'] },
+  { v: '2.9.5', d: 'Nov 6, 2026', items: ['Satellite: Cabling is New Xplore Standard Cabling; Other asks why Xplore standards were not met. Ground Block Other asks why a new one was not installed.'] },
+  { v: '2.9.4', d: 'Nov 6, 2026', items: [
+    'Reused existing mount tick box is always showing under Mount Type.',
+    'Satellite: Mount Type lists each type once (Tri-Mast on Roof, Tri-Mast on Wall, Tri-Mast on NPRM, Pole Mount), with the same Reused existing mount tick box.'
+  ] },
+  { v: '2.9.3', d: 'Nov 6, 2026', items: [
+    'Fixed Wireless: Mount Type lists each type once, with a Reused existing mount tick box. CPE Height sits beside Mount Location.',
+    'Fixed Wireless install: Mount Installed Into is now Mounting Surface. Cabling is New Xplore Standard Cabling; Other asks why Xplore standards were not met. Surge Suppressor Other asks why a new one was not installed.'
+  ] },
+  { v: '2.9.2', d: 'Nov 6, 2026', items: [
+    'Fixed Wireless install: new Platform question (FWN or LTE) beside Tower. FWN greys out the CAT12 radios; LTE greys out First Gen 5G.',
+    'Fixed Wireless: SINR now sits beside RSRP. Installs and conversions drop the +/- button, since SINR is always positive there.'
+  ] },
+  { v: '2.9.1', d: 'Nov 6, 2026', items: [
+    'Light Level Reading is always showing under Connector Type, ready to fill in.',
+    'Fibre drops: Spans only asks for aerial and hybrid drops, and Road Crossing is skipped for Buried, MPT in Vault.',
+    'Drop Only: new choice Partial Run, Not to Structure (such as just the road crossing). It skips Drop Installation Status.'
+  ] },
+  { v: '2.9.0', d: 'Nov 6, 2026', items: [
+    'New form: Install, Fibre, Drop Only. It asks the drop questions only.',
+    'Drop Installation Status: Temp Drop Required is now Temp Drop Completed.'
+  ] },
+  { v: '2.8.5', d: 'Nov 6, 2026', items: [
+    'Copying from further up the page now scrolls down to the finished comment.',
+    'Fibre Drop Required: Road Crossing is now Required or Not Required. If it was required, Road Crossing Conditions asks how: Under 80 km/h, Flaggers on Site or Other.'
+  ] },
+  { v: '2.8.4', d: 'Nov 6, 2026', items: [
+    'Fibre: the Fibre Patch question is gone.',
+    'Fibre Drop Required: Temp Drop is now Drop Installation Status (Fully Installed or Temp Drop Required). A temp drop then asks for the reason, then the checklist.',
+    'Drop to Structure is now How the Drop Runs to the Structure: Buried from Flower Pot, Buried from Vault, Buried from Base of Pole or Hung Aerial from Pole.'
+  ] },
+  { v: '2.8.3', d: 'Nov 6, 2026', items: [
+    'Fibre: Final Light Level is now called Light Level Reading.',
+    'Fibre Drop Required: Road Crossing and Temp Drop now use the same buttons as the other questions.'
+  ] },
+  { v: '2.8.2', d: 'Nov 6, 2026', items: [
+    'Fibre: Final Light Level now sits under Connector Type, since the reading is taken at the NID once the connector is on.',
+    'Splice already done in NID moved under Connector Type too.',
+    'TV units are now XTV Boxes.',
+    'The pictures checklist is gone from every form.',
+    'The app now opens in light mode with a white background.'
+  ] },
+  { v: '2.8.1', d: 'Nov 6, 2026', items: ['Settings are removed for now. The app follows your phone\'s light or dark mode.'] },
+  { v: '2.8.0', d: 'Nov 6, 2026', items: [
+    'New job picker: choose the Job Type, Platform and Outcome right away. Grey placeholders show where the questions will load.',
+    'Fibre installs and conversions then ask for the drop: Existing Drop or Drop Required.',
+    'Cannot Complete, Not Required and Drop Only are greyed out for now. Those forms are coming.'
+  ] },
   { v: '2.7.1 to 2.7.2', d: 'Nov 4, 2026', items: ['FSL Comments Generator is now called Field Notes, with a new icon to match Field Kit.'] },
   { v: '2.7.0', d: 'Nov 4, 2026', items: [
     'Every successful completion job is now here: pick the Job Type (New Install, Conversion or Repair) and the Service at the top of the form.',

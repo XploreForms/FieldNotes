@@ -1,0 +1,25 @@
+Field Notes - hosting package (v2.10.1)
+
+WHAT THIS IS
+A small static website. No server, database or build step is needed.
+
+FILES
+index.html            the whole app
+manifest.webmanifest  lets techs "Add to Home Screen" as an app
+sw.js                 saves the app on the phone so it opens with no signal
+icon-192.png, icon-512.png   home screen icons
+
+HOSTING (it MUST be served over https:// for offline mode to work)
+- Netlify: go to app.netlify.com/drop and drag this whole folder in.
+- GitHub Pages: put these files in a repo and turn on Pages.
+- Your own server: copy the folder contents to any web directory served over HTTPS.
+
+HOW TECHS GET OFFLINE MODE
+1. Open the website once while they have signal.
+2. iPhone (Safari): Share button, then "Add to Home Screen".
+   Android (Chrome): menu, then "Add to Home screen" or "Install app".
+3. From then on, open it from the home screen icon. It works with no signal.
+
+UPDATING
+Re-run build.py (it bumps nothing by itself: change VERSION first). The version is
+in the CACHE name in sw.js, which is what makes phones fetch the new copy.
